@@ -1,0 +1,129 @@
+;
+; assembly.qdot -- QDot assembly instructions;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%ifndef QDOT_ASSEMBLY_QDT
+%define QDOT_ASSEMBLY_QDT
+%push QDOT_ASSEMBLY_QDT
+
+
+;;;;;;;;;;;;;;
+; constants
+;;;;;;;;;;;;;;
+
+NULL equ 0000h
+FALSE equ 0000h
+TRUE equ ~FALSE
+
+
+;;;;;;;;;;;;;;
+; debug
+;;;;;;;;;;;;;;
+
+%macro ?debug 0
+  %push debug
+  jmp %%debug_end
+  %%debug db 'debug'
+  %%debug_end:
+  %pop debug
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; ?pusha
+;;;;;;;;;;;;;;
+
+; %macro ?pusha 0
+;   push ax
+;   push cx
+;   push dx
+;   push bx
+;   push bp
+;   push si
+;   push di
+; %endmacro
+
+
+;;;;;;;;;;;;;;
+; ?popa
+;;;;;;;;;;;;;;
+
+; %macro ?popa 0
+;   pop di
+;   pop si
+;   pop bp
+;   pop bx
+;   pop dx
+;   pop cx
+;   pop ax
+; %endmacro
+
+
+;;;;;;;;;;;;;;
+; meta
+;;;;;;;;;;;;;;
+
+; %macro ?meta 4
+;   %ifidni %2, word
+;     %defstr %%string3 %3
+;     %substr %%char3 %%string3 1
+;     %ifidn %%char3, '['
+;       %defstr %%string4 %4
+;       %substr %%char4 %%string4 1
+;       %ifidn %%char4, '['
+;         push ax
+;         mov ax, %4
+;         %1 %3, ax
+;         pop ax
+;       %else
+;         %1 %2 %3, %4
+;       %endif
+;    %else
+;      %1 %3, %4
+;    %endif
+
+;   %elifidni %2, byte
+;     %defstr %%string3 %3
+;     %substr %%char3 %%string3 1
+;     %ifidn %%char3, '['
+;       %defstr %%string4 %4
+;       %substr %%char4 %%string4 1
+;       %ifidn %%char4, '['
+;         push ax
+;         mov al, %4
+;         %1 %3, al
+;         pop ax
+;       %else
+;         %1 %2 %3, %4
+;       %endif
+;    %else
+;      %1 %3, %4
+;    %endif
+
+;   %else
+;     %error "expected 'byte' or 'word' keywords as the second parameter"
+;   %endif
+; %endmacro
+
+
+%pop QDOT_ASSEMBLY_QDT
+%endif ; QDOT_ASSEMBLY_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

@@ -1,0 +1,150 @@
+;
+; command.qdt -- Command-line processing;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push UI_COMMAND_QDT
+
+
+;;;;;;;;;;;;;;;;;;
+; cmdtable
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_cmdtable
+%ifndef IMPORTED_cmdtable
+%define IMPORTED_cmdtable
+
+%macro cmdtable 0
+  %push cmdtable
+%endmacro
+
+%endif ; IMPORTED_cmdtable
+%endif ; IMPORT_cmdtable
+
+
+;;;;;;;;;;
+; cmd
+;;;;;;;;;;
+
+%ifdef IMPORT_cmd
+%ifndef IMPORTED_cmd
+%define IMPORTED_cmd
+
+?import END
+%include "kernel/memory.qdt"
+
+%macro cmd 2
+  db %1, END
+  dw %2
+%endmacro
+
+%endif ; IMPORTED_cmd
+%endif ; IMPORT_cmd
+
+
+;;;;;;;;;;;;;;;;;;
+; endcmdtable
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_endcmdtable
+%ifndef IMPORTED_endcmdtable
+%define IMPORTED_endcmdtable
+
+?import END
+%include "kernel/memory.qdt"
+
+%macro endcmdtable 0
+  dw END
+  %pop cmdtable
+%endmacro
+
+%endif ; IMPORTED_endcmdtable
+%endif ; IMPORT_endcmdtable
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; command_extract_args
+;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_command_extract_args
+%ifndef IMPORTED_command_extract_args
+%define IMPORTED_command_extract_args
+
+?import memory_skip_char, END
+%include "kernel/memory.qdt"
+
+?func command_extract_args, %$cmd_args, %$cmd_buffer
+  ?local %$src, %$dest
+  ? =, %$src, call, memory_skip_char, %$cmd_buffer, ' '
+  ? =, %$dest, %$cmd_args
+  ?while !=, END, @byte, %$$src
+    ?switch @byte, %$$$src
+      ?case ==, ' '
+        ? =, %$$$src, call, memory_skip_char, %$$$src, ' '
+        ?if !=, END, @byte, %$$$$src
+          ? @byte=, $++, %$$$$dest, END
+        ?endif
+      ?default
+        ? @byte=, $++, %$$$dest, @byte, $++, %$$$src
+    ?endswitch
+  ?endwhile
+  ? @byte=, $++, %$dest, END
+  ? @byte=, $++, %$dest, END
+?endfunc
+
+%endif ; IMPORTED_command_extract_args
+%endif ; IMPORT_command_extract_args
+
+
+;;;;;;;;;;;;;;
+; command_run
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_command_run
+%ifndef IMPORTED_command_run
+%define IMPORTED_command_run
+
+?import command_extract_args
+%include "ui/command.qdt"
+
+?import END, memory_streq, memory_strlen
+%include "kernel/memory.qdt"
+
+?func command_run, %$cmd_args, %$cmd_buffer, %$cmdtable
+  ?local %$cmdtable_ptr
+  ? call, command_extract_args, %$cmd_args, %$cmd_buffer
+  ? =, %$cmdtable_ptr, %$cmdtable
+  ?while !=, END, @word, %$$cmdtable_ptr
+    ?if call, memory_streq, %$$$cmd_args, %$$$cmdtable_ptr
+      ? +=, %$$$cmdtable_ptr, call, memory_strlen, %$$$cmdtable_ptr
+      ? dcall, @word, inc, %$$$cmdtable_ptr, %$$$cmd_args
+      ?return TRUE
+    ?else
+      ? +=, %$$$cmdtable_ptr, +, 3, call, memory_strlen, %$$$cmdtable_ptr
+    ?endif
+  ?endwhile
+?endfunc FALSE
+
+%endif ; IMPORTED_command_run
+%endif ; IMPORT_command_run
+
+
+%pop UI_COMMAND_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

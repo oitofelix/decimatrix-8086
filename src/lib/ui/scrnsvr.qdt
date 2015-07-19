@@ -1,0 +1,74 @@
+;
+; scrnsvr.qdt -- Screen-savers;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push UI_SCRSVR_QDT
+
+
+;;;;;;;;;;;;;;;;;;;
+; scrnsvr_dcmatrix
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_scrnsvr_dcmatrix
+%ifndef IMPORTED_scrnsvr_dcmatrix
+%define IMPORTED_scrnsvr_dcmatrix
+
+?import keyboard_check_char, keyboard_flush_buffer
+%include "kernel/keyboard.qdt"
+
+?import video_win_maxrow, video_win_maxcol, color, LIGHT_GREEN, BLACK, \
+  GREEN, video_setpos, video_draw_char
+%include "kernel/video.qdt"
+
+?import random_number
+%include "math/random.qdt"
+
+?import timer_wait
+%include "kernel/timer.qdt"
+
+?func scrnsvr_dcmatrix, %$forever
+  ?local %$i, %$r, %$c, %$char, %$color
+  ?while ||, ==, -1, call, keyboard_check_char, %$$forever
+    ?for =, %$$$i, /, \
+      call, random_number, 0, *, [video_win_maxrow], [video_win_maxcol], \
+      call, random_number, 1, *, [video_win_maxrow], [video_win_maxcol]
+      ?cond >, %$$$i, 0
+      ? =, %$$$char, call, random_number, 30h, 39h
+      ? =, %$$$color, ?:, <=, %$$$char, 31h, \
+        color(LIGHT_GREEN,BLACK), color(GREEN,BLACK)
+      ? =, %$$$r, call, random_number, 0, [video_win_maxrow]
+      ? =, %$$$c, call, random_number, 0, [video_win_maxcol]
+      ? call, video_setpos, %$$$r, %$$$c
+      ? call, video_draw_char, %$$$char, %$$$color, 1
+    ?next --, %$$$i
+    ? call, timer_wait, /, \
+        call, random_number, 0, 2, \
+        call, random_number, 1, 2
+  ?endwhile
+  ? call, keyboard_flush_buffer
+?endfunc
+
+%endif ; IMPORTED_scrnsvr_dcmatrix
+%endif ; IMPORT_scrnsvr_dcmatrix
+
+
+%pop UI_SCRSVR_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

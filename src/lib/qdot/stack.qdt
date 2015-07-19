@@ -1,0 +1,552 @@
+;
+; stack.qdt -- ? stack-based operations;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%ifndef QDOT_STACK_QDT
+%define QDOT_STACK_QDT
+%push QDOT_STACK_QDT
+
+
+;;;;;
+; ?
+;;;;;
+
+%macro ? 0-*
+  %rep %0
+    %rotate -1
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; arithmetic (+, -, *, /, %, inc, dec, abs, min, max, neg)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; +, a, b => a+b
+    %ifidni %1, +
+      pop ax
+      pop bx
+      add ax, bx
+      push ax
+
+    ;; -, a, b => a-b
+    %elifidni %1, -
+      pop ax
+      pop bx
+      sub ax, bx
+      push ax
+
+    ;; *, a, b => a*b
+    %elifidni %1, *
+      pop ax
+      pop bx
+      mul bx
+      push ax
+
+    ;; /, a, b => a/b
+    %elifidni %1, /
+      mov dx, 0
+      pop ax
+      pop bx
+      div bx
+      push ax
+
+    ;; %, a, b => a%b
+    %elifidni %1, %
+      mov dx, 0
+      pop ax
+      pop bx
+      div bx
+      push dx
+
+    ;; inc, a => a-1
+    %elifidni %1, inc
+      pop ax
+      inc ax
+      push ax
+
+    ;; dec, a => a-1
+    %elifidni %1, dec
+      pop ax
+      dec ax
+      push ax
+
+    ;; abs, a => abs(a)
+    %elifidni %1, abs
+      %push
+      pop ax
+      %$neg: neg ax
+      jo %$end
+      js %$neg
+      %$end: push ax
+      %pop
+
+    ;; min, a, b => min(a,b)
+    %elifidni %1, min
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jb %$a
+      push bx
+      jmp %$end
+      %$a: push ax
+      %$end:
+      %pop
+
+    ;; max, a, b => max(a,b)
+    %elifidni %1, max
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      ja %$a
+      push bx
+      jmp %$end
+      %$a: push ax
+      %$end:
+      %pop
+
+    ;; neg, a => -a
+    %elifidni %1, neg
+      pop ax
+      neg ax
+      push ax
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; bit-wise (~, &, |, ^, <<, >>)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; ~, a => ~a
+    %elifidni %1, ~
+      pop ax
+      not ax
+      push ax
+
+    ;; &, a, b => a&b
+    %elifidni %1, &
+      pop ax
+      pop bx
+      and ax, bx
+      push ax
+
+    ;; |, a, b => a|b
+    %elifidni %1, |
+      pop ax
+      pop bx
+      or ax, bx
+      push ax
+
+    ;; ^, a, b => a^b
+    %elifidni %1, ^
+      pop ax
+      pop bx
+      xor ax, bx
+      push ax
+
+    ;; <<, a, n => a<<n
+    %elifidni %1, <<
+      pop ax
+      pop cx
+      shl ax, cl
+      push ax
+
+
+    ;; >>, a, n => a>>n
+    %elifidni %1, >>
+      pop ax
+      pop cx
+      shr ax, cl
+      push ax
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; boolean (!, &&, ||)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; !, a => !a
+    %elifidni %1, !
+      pop ax
+      not ax
+      push ax
+
+    ;; &&, a, b => a&&b
+    %elifidni %1, &&
+      pop ax
+      pop bx
+      and ax, bx
+      push ax
+
+    ;; ||, a, b => a||b
+    %elifidni %1, ||
+      pop ax
+      pop bx
+      or ax, bx
+      push ax
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; comparison (==, !=, <, <=, >, >=)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; ==, a, b => a==b
+    %elifidni %1, ==
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      je %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; !=, a, b => a!=b
+    %elifidni %1, !=
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jne %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; <, a, b => a<b
+    %elifidni %1, <
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jb %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; <=, a, b => a<=b
+    %elifidni %1, <=
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jbe %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; <=-, a, b => a<=b
+    %elifidni %1, <=-
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jle %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; >, a, b => a>b
+    %elifidni %1, >
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      ja %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; >=, a, b => a>=b
+    %elifidni %1, >=
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jae %$true
+      mov ax, FALSE
+      jmp %$end
+      %$true:
+        mov ax, TRUE
+      %$end:
+      push ax
+      %pop
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; assignment (=, +=, -=, *=, /=, %=, &=, |=, ^=, <<=, >>=)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+    ;; =, a, b => | b -> a
+    %elifidni %1, =
+      pop word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, =
+      ; ignore
+
+    ;; =$, a, b => b | b -> a
+    %elifidni %1, =$
+      pop word %2
+      push word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, =$
+      ; ignore
+
+    ;; +=, a, b => | a+b -> a
+    %elifidni %1, +=
+      pop bx
+      add %2, bx
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, +=
+      ; ignore
+
+    ;; -=, a, b => | a-b -> a
+    %elifidni %1, -=
+      pop bx
+      sub %2, bx
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, -=
+      ; ignore
+
+    ;; *=, a, b => | a*b -> a
+    %elifidni %1, *=
+      pop ax
+      mul word %2
+      mov %2, ax
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, *=
+      ; ignore
+
+    ;; /=, a, b => | a/b -> a
+    %elifidni %1, /=
+      mov dx, 0
+      mov ax, %2
+      pop bx
+      div bx
+      mov %2, ax
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, /=
+      ; ignore
+
+    ;; %=, a, b => | a%b -> a
+    %elifidni %1, %=
+      mov dx, 0
+      mov ax, %2
+      pop bx
+      div bx
+      mov %2, dx
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, %=
+      ; ignore
+
+
+    ;; &=, a, b => | a&b -> a
+    %elifidni %1, &=
+      pop bx
+      and %2, bx
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, &=
+      ; ignore
+
+    ;; |=, a, b => | a|b -> a
+    %elifidni %1, |=
+      pop bx
+      or %2, bx
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, |=
+      ; ignore
+
+    ;; ^=, a, b => | a^b -> a
+    %elifidni %1, ^=
+      pop bx
+      xor %2, bx
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, ^=
+      ; ignore
+
+    ;; <<=, a, n => | a<<n -> a
+    %elifidni %1, <<=
+      pop cx
+      shl %2, cl
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, <<=
+      ; ignore
+
+    ;; >>=, a, n => | a>>n -> a
+    %elifidni %1, >>=
+      pop cx
+      shr %2, cl
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, >>=
+      ; ignore
+
+    ;; ++, a => | a+1 -> a
+    %elifidni %1, ++
+      inc word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, ++
+      ; ignore
+
+    ;; ++$, a => a+1 | a+1 -> a
+    %elifidni %1, ++$
+      inc word %2
+      push word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, ++$
+      ; ignore
+
+    ;; $++, a => a | a+1 -> a
+    %elifidni %1, $++
+      push word %2
+      inc word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, $++
+      ; ignore
+
+    ;; --, a => a | a-1 -> a
+    %elifidni %1, --
+      dec word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, --
+      ; ignore
+
+    ;; --$, a => a-1 | a-1 -> a
+    %elifidni %1, --$
+      dec word %2
+      push word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, --$
+      ; ignore
+
+    ;; $--, a => a | a-1 -> a
+    %elifidni %1, $--
+      push word %2
+      dec word %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, $--
+      ; ignore
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; misc (call, @, ?:)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; call, a => r1, r2, ..., r(n-1), r(n)
+    %elifidni %1, call
+      call %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, call
+      ; ignore
+
+    ;; dcall, a => r1, r2, ..., r(n-1), r(n)
+    %elifidni %1, dcall
+      pop ax
+      call ax
+
+    ;; @word, a => *a
+    %elifidni %1, @word
+      pop bx
+      push word [bx]
+
+    ;; @byte, a => *a & 00FFh
+    %elifidni %1, @byte
+      pop bx
+      mov bx, [bx]
+      and bx, 00FFh
+      push bx
+
+    ;; @byte=, a, b => | b -> *a
+    %elifidni %1, @byte=
+      pop bx
+      pop ax
+      mov [bx], al
+
+    ;; ?:, a, b, c => a ? b : c
+    %elifidni %1, ?:
+      %push
+      pop ax
+      pop bx
+      pop cx
+      cmp ax, TRUE
+      je %$b
+      push cx
+      jmp %$end
+      %$b: push bx
+      %$end:
+      %pop
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; meta (drop)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; drop
+    %elifidni %1, drop
+      pop ax
+
+    ;; dup
+    %elifidni %1, dup
+      pop ax
+      push ax
+      push ax
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; push operand
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    %else
+      %defstr %%string %1
+      %substr %%char %%string 1
+      %ifidn %%char, '['
+        push word %1
+      %else
+        mov ax, %1
+        push ax
+      %endif
+    %endif
+  %endrep
+%endmacro
+
+
+%pop QDOT_STACK_QDT
+%endif ; QDOT_STACK_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

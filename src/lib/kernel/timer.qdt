@@ -1,0 +1,120 @@
+;
+; timer.qdt -- timer facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_TIMER_QDT
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; timer_seconds2ticks
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_timer_seconds2ticks
+%ifndef IMPORTED_timer_seconds2ticks
+%define IMPORTED_timer_seconds2ticks
+
+%define timer_seconds2ticks(seconds) ((seconds * 182) / 10)
+
+%endif ; IMPORTED_timer_seconds2ticks
+%endif ; IMPORT_timer_seconds2ticks
+
+
+;;;;;;;;;;;;;;
+; timer_sleep
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_timer_sleep
+%ifndef IMPORTED_timer_sleep
+%define IMPORTED_timer_sleep
+
+?func timer_sleep, %$ticks
+  mov ah, 00h
+  int 1Ah
+  mov bx, dx
+  %$loop:
+    int 1Ah
+    sub dx, bx
+    cmp dx, %$ticks
+  jb %$loop
+?endfunc
+
+%endif ; IMPORTED_timer_sleep
+%endif ; IMPORT_timer_sleep
+
+
+;;;;;;;;;;;;;;
+; timer_wait
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_timer_wait
+%ifndef IMPORTED_timer_wait
+%define IMPORTED_timer_wait
+
+?func timer_wait, %$miliseconds
+  mov ax, 1024
+  mul word %$miliseconds
+  mov cx, dx
+  mov dx, ax
+  mov ah, 86h
+  int 15h
+?endfunc
+
+%endif ; IMPORTED_timer_wait
+%endif ; IMPORT_timer_wait
+
+
+;;;;;;;;;;;;;;
+; timer_alarm
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_timer_alarm
+%ifndef IMPORTED_timer_alarm
+%define IMPORTED_timer_alarm
+
+timer_alarm_start_tick dw 0000h
+timer_alarm_ticks dw 0000h
+
+?func timer_alarm, %$ticks
+  cmp word %$ticks, 0
+  jz %$read
+  mov ah, 00h
+  int 1Ah
+  mov [timer_alarm_start_tick], dx
+  mov ax, %$ticks
+  mov [timer_alarm_ticks], ax
+  ?return
+
+%$read:
+  mov ah, 00h
+  int 1Ah
+  sub dx, [timer_alarm_start_tick]
+  cmp dx, [timer_alarm_ticks]
+  jb %$end
+  ?return TRUE
+  %$end:
+?endfunc FALSE
+
+%endif ; IMPORTED_timer_alarm
+%endif ; IMPORT_timer_alarm
+
+
+%pop KERNEL_TIMER_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

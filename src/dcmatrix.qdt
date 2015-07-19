@@ -1,0 +1,95 @@
+;
+; dcmatrix.qdt -- main program;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push SRC_DCMATRIX_QDT
+
+
+%ifndef SRC_DCMATRIX_QDT
+%define SRC_DCMATRIX_QDT
+
+CPU 8086
+ORG 100h
+
+%include "qdot/qdot.qdt"
+
+?import boot_sector
+%include "kernel/boot.qdt"
+
+mov sp, 0FFFEh
+mov bp, sp
+
+call main
+
+?import main
+%include "src/dcmatrix.qdt"
+
+; Make this program's size a multiple of the sector size (512 bytes)
+; so the boot loader can exactly load it.
+
+times 512 - ($ - $$) % 512 db 0
+
+PROGRAM_END:
+
+%endif ; SRC_DCMATRIX_QDT
+
+
+;;;;;;;
+; main
+;;;;;;;
+
+%ifdef IMPORT_main
+%ifndef IMPORTED_main
+%define IMPORTED_main
+
+?import scrnsvr_dcmatrix
+%include "ui/scrnsvr.qdt"
+
+?import video_init, video_disable_cursor, video_win_color, color, \
+  GREEN, BLACK, LIGHT_GRAY, video_cls
+%include "kernel/video.qdt"
+
+?import random_init
+%include "math/random.qdt"
+
+?import dos_check_if_running, dos_exit
+%include "os/dos.qdt"
+
+?func main
+  ? call, random_init
+  ? call, video_init
+  ? call, video_disable_cursor
+  ? =, [video_win_color], color(GREEN,BLACK)
+  ? call, video_cls
+
+  ? call, scrnsvr_dcmatrix, !, call, dos_check_if_running
+
+  ? =, [video_win_color], color(LIGHT_GRAY,BLACK)
+  ? call, video_cls
+  ? call, dos_exit
+?endfunc
+
+%endif ; IMPORTED_main
+%endif ; IMPORT_main
+
+
+%pop SRC_DCMATRIX_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

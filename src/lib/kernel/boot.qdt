@@ -1,0 +1,110 @@
+;
+; boot.qdt -- Boot loader;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_BOOT_QDT
+
+
+;;;;;;;;;;;;;;;;;;
+; boot_align_code
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_boot_align_code
+%ifndef IMPORTED_boot_align_code
+%define IMPORTED_boot_align_code
+
+%macro boot_align_code 3
+  %assign %%segment ((%1 * 10h) + %2 - %3) / 10h
+  jmp %%segment:%%align
+  %%align:
+%endmacro
+
+%endif ; IMPORTED_boot_align_code
+%endif ; IMPORT_boot_align_code
+
+
+;;;;;;;;;;;;;;
+; boot_sector
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_boot_sector
+%ifndef IMPORTED_boot_sector
+%define IMPORTED_boot_sector
+
+?import boot_align_code
+%include "kernel/boot.qdt"
+
+PROGRAM_START:
+
+mov ax, cs
+cmp ax, 0000h
+jnz %$end
+
+boot_align_code 0000h, 7C00h, 0100h
+
+mov bx, cs
+mov ds, bx
+mov es, bx
+mov ss, bx
+mov sp, 0FFFEh
+mov bp, sp
+
+mov dh, 0
+push dx
+push cs
+call boot_strap
+jmp %$end
+
+?import boot_strap
+%include "kernel/boot.qdt"
+
+times 0200h - 2 - ($ - $$)  db 0 ; Zerofill up to 510 bytes
+
+dw 0AA55h
+
+%$end:
+
+%endif ; IMPORTED_boot_sector
+%endif ; IMPORT_boot_sector
+
+
+;;;;;;;;;;;;;;
+; boot_strap
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_boot_strap
+%ifndef IMPORTED_boot_strap
+%define IMPORTED_boot_strap
+
+?import disk_read_sectors
+%include "kernel/disk.qdt"
+
+?func boot_strap, %$buffer_segment, %$disk
+  ? call, disk_read_sectors, %$buffer_segment, 0100h, %$disk, 0, \
+    (PROGRAM_END - PROGRAM_START) / 512
+?endfunc
+
+%endif ; IMPORTED_boot_strap
+%endif ; IMPORT_boot_strap
+
+
+%pop KERNEL_BOOT_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

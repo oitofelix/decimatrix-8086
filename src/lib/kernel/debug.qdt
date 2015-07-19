@@ -1,0 +1,124 @@
+;
+; debug.qdt -- debug facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_DEBUG_QDT
+
+
+;;;;;;;;;;;;;;;;;;;
+; debug_print_char
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_debug_print_char
+%ifndef IMPORTED_debug_print_char
+%define IMPORTED_debug_print_char
+
+?func debug_print_char, %$char
+  mov ah, 0Eh
+  mov al, %$char
+  mov bh, 00h
+  int 10h
+?endfunc
+
+%endif ; IMPORTED_debug_print_char
+%endif ; IMPORT_debug_print_char
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; debug_print_hex_digit
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_debug_print_hex_digit
+%ifndef IMPORTED_debug_print_hex_digit
+%define IMPORTED_debug_print_hex_digit
+
+?import debug_print_char
+%include "kernel/debug.qdt"
+
+?func debug_print_hex_digit, %$digit
+  mov al, %$digit
+  add al, 30h
+  cmp al, 3Ah
+  jb .print
+  add al, 07h
+  .print:
+    mov %$digit, al
+    ? call, debug_print_char, %$digit
+?endfunc
+
+%endif ; IMPORTED_debug_print_hex_digit
+%endif ; IMPORT_debug_print_hex_digit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; debug_print_byte
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_debug_print_byte
+%ifndef IMPORTED_debug_print_byte
+%define IMPORTED_debug_print_byte
+
+?import debug_print_hex_digit
+%include "kernel/debug.qdt"
+
+?func debug_print_byte, %$byte
+  ?local %$hex_digit
+  mov al, %$byte
+  mov cl, 4
+  shr al, cl
+  mov %$hex_digit, al
+  ? call, debug_print_hex_digit, %$hex_digit
+  mov al, %$byte
+  and al, 0Fh
+  mov %$hex_digit, al
+  ? call, debug_print_hex_digit, %$hex_digit
+?endfunc
+
+%endif ; IMPORTED_debug_print_byte
+%endif ; IMPORT_debug_print_byte
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; debug_print_word
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_debug_print_word
+%ifndef IMPORTED_debug_print_word
+%define IMPORTED_debug_print_word
+
+?import debug_print_byte
+%include "kernel/debug.qdt"
+
+?func debug_print_word, %$word
+  ?local %$byte
+  mov ax, %$word
+  mov al, ah
+  mov %$byte, ax
+  ? call, debug_print_byte, %$byte
+  ? call, debug_print_byte, %$word
+?endfunc
+
+%endif ; IMPORTED_debug_print_word
+%endif ; IMPORT_debug_print_word
+
+
+%pop KERNEL_DEBUG_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

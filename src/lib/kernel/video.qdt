@@ -1,0 +1,1240 @@
+;
+; video.qdt -- video facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_VIDEO_QDT
+
+
+;;;;;;;;;;;;;
+; video_rows
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_rows
+%ifndef IMPORTED_video_rows
+%define IMPORTED_video_rows
+
+video_rows dw 0000h
+
+%endif ; IMPORTED_video_rows
+%endif ; IMPORT_video_rows
+
+
+;;;;;;;;;;;;;
+; video_cols
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_cols
+%ifndef IMPORTED_video_cols
+%define IMPORTED_video_cols
+
+video_cols dw 0000h
+
+%endif ; IMPORTED_video_cols
+%endif ; IMPORT_video_cols
+
+
+;;;;;;;;;;;;;;;
+; video_maxrow
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_maxrow
+%ifndef IMPORTED_video_maxrow
+%define IMPORTED_video_maxrow
+
+video_maxrow dw 0000h
+
+%endif ; IMPORTED_video_maxrow
+%endif ; IMPORT_video_maxrow
+
+
+;;;;;;;;;;;;;;;
+; video_maxcol
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_maxcol
+%ifndef IMPORTED_video_maxcol
+%define IMPORTED_video_maxcol
+
+video_maxcol dw 0000h
+
+%endif ; IMPORTED_video_maxcol
+%endif ; IMPORT_video_maxcol
+
+
+;;;;;;;;;;;;;
+; video_page
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_page
+%ifndef IMPORTED_video_page
+%define IMPORTED_video_page
+
+video_page dw 0000h
+
+%endif ; IMPORTED_video_page
+%endif ; IMPORT_video_page
+
+
+;;;;;;;;;;;;;;;;;
+; video_win_rows
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_rows
+%ifndef IMPORTED_video_win_rows
+%define IMPORTED_video_win_rows
+
+video_win_rows dw 0000h
+
+%endif ; IMPORTED_video_win_rows
+%endif ; IMPORT_video_win_rows
+
+
+;;;;;;;;;;;;;;;;;;
+; video_win_cols
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_cols
+%ifndef IMPORTED_video_win_cols
+%define IMPORTED_video_win_cols
+
+video_win_cols dw 0000h
+
+%endif ; IMPORTED_video_win_cols
+%endif ; IMPORT_video_win_cols
+
+
+;;;;;;;;;;;;;;;;;;;
+; video_win_minrow
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_minrow
+%ifndef IMPORTED_video_win_minrow
+%define IMPORTED_video_win_minrow
+
+video_win_minrow dw 0000h
+
+%endif ; IMPORTED_video_win_minrow
+%endif ; IMPORT_video_win_minrow
+
+
+;;;;;;;;;;;;;;;;;;;
+; video_win_mincol
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_mincol
+%ifndef IMPORTED_video_win_mincol
+%define IMPORTED_video_win_mincol
+
+video_win_mincol dw 0000h
+
+%endif ; IMPORTED_video_win_mincol
+%endif ; IMPORT_video_win_mincol
+
+
+;;;;;;;;;;;;;;;;;;;
+; video_win_maxrow
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_maxrow
+%ifndef IMPORTED_video_win_maxrow
+%define IMPORTED_video_win_maxrow
+
+video_win_maxrow dw 0000h
+
+%endif ; IMPORTED_video_win_maxrow
+%endif ; IMPORT_video_win_maxrow
+
+
+;;;;;;;;;;;;;;;;;;;
+; video_win_maxcol
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_maxcol
+%ifndef IMPORTED_video_win_maxcol
+%define IMPORTED_video_win_maxcol
+
+video_win_maxcol dw 0000h
+
+%endif ; IMPORTED_video_win_maxcol
+%endif ; IMPORT_video_win_maxcol
+
+
+;;;;;;;;;;;;;;;;;;
+; video_win_color
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_win_color
+%ifndef IMPORTED_video_win_color
+%define IMPORTED_video_win_color
+
+video_win_color dw 0000h
+
+%endif ; IMPORTED_video_win_color
+%endif ; IMPORT_video_win_color
+
+
+;;;;;;;;
+; BLACK
+;;;;;;;;
+
+%ifdef IMPORT_BLACK
+%ifndef IMPORTED_BLACK
+%define IMPORTED_BLACK
+
+BLACK equ 0000b
+
+%endif ; IMPORTED_BLACK
+%endif ; IMPORT_BLACK
+
+
+;;;;;;;;
+; BLUE
+;;;;;;;;
+
+%ifdef IMPORT_BLUE
+%ifndef IMPORTED_BLUE
+%define IMPORTED_BLUE
+
+BLUE equ 0001b
+
+%endif ; IMPORTED_BLUE
+%endif ; IMPORT_BLUE
+
+
+;;;;;;;;
+; GREEN
+;;;;;;;;
+
+%ifdef IMPORT_GREEN
+%ifndef IMPORTED_GREEN
+%define IMPORTED_GREEN
+
+GREEN equ 0010b
+
+%endif ; IMPORTED_GREEN
+%endif ; IMPORT_GREEN
+
+
+;;;;;;;;
+; CYAN
+;;;;;;;;
+
+%ifdef IMPORT_CYAN
+%ifndef IMPORTED_CYAN
+%define IMPORTED_CYAN
+
+CYAN equ 0011b
+
+%endif ; IMPORTED_CYAN
+%endif ; IMPORT_CYAN
+
+
+;;;;;;;;
+; RED
+;;;;;;;;
+
+%ifdef IMPORT_RED
+%ifndef IMPORTED_RED
+%define IMPORTED_RED
+
+RED equ 0100b
+
+%endif ; IMPORTED_RED
+%endif ; IMPORT_RED
+
+
+;;;;;;;;;;
+; MAGENTA
+;;;;;;;;;;
+
+%ifdef IMPORT_MAGENTA
+%ifndef IMPORTED_MAGENTA
+%define IMPORTED_MAGENTA
+
+MAGENTA equ 0101b
+
+%endif ; IMPORTED_MAGENTA
+%endif ; IMPORT_MAGENTA
+
+
+;;;;;;;;
+; BROWN
+;;;;;;;;
+
+%ifdef IMPORT_BROWN
+%ifndef IMPORTED_BROWN
+%define IMPORTED_BROWN
+
+BROWN equ 0110b
+
+%endif ; IMPORTED_BROWN
+%endif ; IMPORT_BROWN
+
+
+;;;;;;;;;;;;;
+; LIGHT_GRAY
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_LIGHT_GRAY
+%ifndef IMPORTED_LIGHT_GRAY
+%define IMPORTED_LIGHT_GRAY
+
+LIGHT_GRAY equ 0111b
+
+%endif ; IMPORTED_LIGHT_GRAY
+%endif ; IMPORT_LIGHT_GRAY
+
+
+;;;;;;;;;;;;;
+; DARK_GRAY
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_DARK_GRAY
+%ifndef IMPORTED_DARK_GRAY
+%define IMPORTED_DARK_GRAY
+
+DARK_GRAY equ 1000b
+
+%endif ; IMPORTED_DARK_GRAY
+%endif ; IMPORT_DARK_GRAY
+
+
+;;;;;;;;;;;;;
+; LIGHT_BLUE
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_LIGHT_BLUE
+%ifndef IMPORTED_LIGHT_BLUE
+%define IMPORTED_LIGHT_BLUE
+
+LIGHT_BLUE equ 1001b
+
+%endif ; IMPORTED_LIGHT_BLUE
+%endif ; IMPORT_LIGHT_BLUE
+
+
+;;;;;;;;;;;;;;
+; LIGHT_GREEN
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_LIGHT_GREEN
+%ifndef IMPORTED_LIGHT_GREEN
+%define IMPORTED_LIGHT_GREEN
+
+LIGHT_GREEN equ 1010b
+
+%endif ; IMPORTED_LIGHT_GREEN
+%endif ; IMPORT_LIGHT_GREEN
+
+
+;;;;;;;;;;;;;
+; LIGHT_CYAN
+;;;;;;;;;;;;;
+
+%ifdef IMPORT_LIGHT_CYAN
+%ifndef IMPORTED_LIGHT_CYAN
+%define IMPORTED_LIGHT_CYAN
+
+LIGHT_CYAN equ 1011b
+
+%endif ; IMPORTED_LIGHT_CYAN
+%endif ; IMPORT_LIGHT_CYAN
+
+
+;;;;;;;;;;;;
+; LIGHT_RED
+;;;;;;;;;;;;
+
+%ifdef IMPORT_LIGHT_RED
+%ifndef IMPORTED_LIGHT_RED
+%define IMPORTED_LIGHT_RED
+
+LIGHT_RED     equ 1100b
+
+%endif ; IMPORTED_LIGHT_RED
+%endif ; IMPORT_LIGHT_RED
+
+
+;;;;;;;;;;;;;;;;
+; LIGHT_MAGENTA
+;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_LIGHT_MAGENTA
+%ifndef IMPORTED_LIGHT_MAGENTA
+%define IMPORTED_LIGHT_MAGENTA
+
+LIGHT_MAGENTA equ 1101b
+
+%endif ; IMPORTED_LIGHT_MAGENTA
+%endif ; IMPORT_LIGHT_MAGENTA
+
+
+;;;;;;;;;
+; YELLOW
+;;;;;;;;;
+
+%ifdef IMPORT_YELLOW
+%ifndef IMPORTED_YELLOW
+%define IMPORTED_YELLOW
+
+YELLOW equ 1110b
+
+%endif ; IMPORTED_YELLOW
+%endif ; IMPORT_YELLOW
+
+
+;;;;;;;;;
+; WHITE
+;;;;;;;;;
+
+%ifdef IMPORT_WHITE
+%ifndef IMPORTED_WHITE
+%define IMPORTED_WHITE
+
+WHITE equ 1111b
+
+%endif ; IMPORTED_WHITE
+%endif ; IMPORT_WHITE
+
+
+
+;;;;;;;;
+; color
+;;;;;;;;
+
+%ifdef IMPORT_color
+%ifndef IMPORTED_color
+%define IMPORTED_color
+
+%define color(fore,back) ((back << 4) | fore)
+
+%endif ; IMPORTED_color
+%endif ; IMPORT_color
+
+
+;;;;;;;;
+; bcolor
+;;;;;;;;
+
+%ifdef IMPORT_bcolor
+%ifndef IMPORTED_bcolor
+%define IMPORTED_bcolor
+
+%define bcolor(fore,back) ((1000b << 4) | (back << 4) | fore)
+
+%endif ; IMPORTED_bcolor
+%endif ; IMPORT_bcolor
+
+
+;;;;;;
+; cor
+;;;;;;
+
+%ifdef IMPORT_cor
+%ifndef IMPORTED_cor
+%define IMPORTED_cor
+
+?import color
+%include "kernel/video.qdt"
+
+?import COLOR_ESC
+%include "kernel/memory.qdt"
+
+%define cor(fore,back) COLOR_ESC, color(fore,back)
+
+%endif ; IMPORTED_cor
+%endif ; IMPORT_cor
+
+
+;;;;;;
+; bcor
+;;;;;;
+
+%ifdef IMPORT_bcor
+%ifndef IMPORTED_bcor
+%define IMPORTED_bcor
+
+?import bcolor
+%include "kernel/video.qdt"
+
+?import COLOR_ESC
+%include "kernel/memory.qdt"
+
+%define bcor(fore,back) COLOR_ESC, bcolor(fore,back)
+
+%endif ; IMPORTED_bcor
+%endif ; IMPORT_bcor
+
+
+;;;;;;;;;;;;;;;;
+; video_init
+;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_init
+%ifndef IMPORTED_video_init
+%define IMPORTED_video_init
+
+?import video_rows, video_cols, video_maxrow, video_maxcol, \
+  video_win_rows, , video_win_cols, video_win_maxrow, \
+  video_win_maxcol, video_win_minrow, video_win_mincol, \
+  video_win_color, color, LIGHT_GRAY, BLACK
+%include "kernel/video.qdt"
+
+?func video_init
+
+  %$try_vga:
+    mov ax, 1202h
+    mov bl, 30h
+    int 10h
+    cmp al, 12h
+    jne %$try_ega
+    mov word [video_cols], 80  ; 80x50
+    mov word [video_rows], 50
+    jmp %$ega_or_vga
+
+  %$try_ega:
+    mov ah, 12h
+    mov bl, 10h
+    int 10h
+    cmp bl, 10h
+    jz %$cga
+    mov word [video_cols], 80 ; 80x43
+    mov word [video_rows], 43
+    jmp %$ega_or_vga
+
+  %$cga:
+    mov word [video_cols], 80 ; 80x25
+    mov word [video_rows], 25
+    mov ax, 0003h
+    int 10h
+    jmp %$end
+
+  %$ega_or_vga:
+    mov ax, 0003h
+    int 10h
+    mov ax, 1112h
+    int 10h
+    jmp %$end
+
+  %$end:
+    mov ax, [video_rows]
+    mov [video_win_rows], ax
+    dec ax
+    mov [video_maxrow], ax
+    mov [video_win_maxrow], ax
+
+    mov ax, [video_cols]
+    mov [video_win_cols], ax
+    dec ax
+    mov [video_maxcol], ax
+    mov [video_win_maxcol], ax
+
+    mov word [video_win_minrow], 0
+    mov word [video_win_mincol], 0
+
+    mov word [video_win_color], color(LIGHT_GRAY,BLACK)
+?endfunc
+
+%endif ; IMPORTED_video_init
+%endif ; IMPORT_video_init
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; video_disable_cursor
+;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_disable_cursor
+%ifndef IMPORTED_video_disable_cursor
+%define IMPORTED_video_disable_cursor
+
+?func video_disable_cursor
+  mov ah, 01h
+  mov cx, 2000h
+  int 10h
+?endfunc
+
+%endif ; IMPORTED_video_disable_cursor
+%endif ; IMPORT_video_disable_cursor
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; video_enable_cursor
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_enable_cursor
+%ifndef IMPORTED_video_enable_cursor
+%define IMPORTED_video_enable_cursor
+
+?func video_enable_cursor
+    mov ah, 01h
+    mov cx, 001Fh
+    int 10h
+?endfunc
+
+%endif ; IMPORTED_video_enable_cursor
+%endif ; IMPORT_video_enable_cursor
+
+
+;;;;;;;;;;;;;;;;;;;
+; video_blink_mode
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_blink_mode
+%ifndef IMPORTED_video_blink_mode
+%define IMPORTED_video_blink_mode
+
+?func video_blink_mode, %$blink
+  mov bx, %$blink
+  and bx, 01h
+  mov ax, 1003h
+  int 10h
+?endfunc
+
+%endif ; IMPORTED_video_blink_mode
+%endif ; IMPORT_video_blink_mode
+
+
+;;;;;;;;;;;;;;;;;;;;
+; video_select_page
+;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_select_page
+%ifndef IMPORTED_video_select_page
+%define IMPORTED_video_select_page
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_select_page, %$p
+  mov ah, 05h
+  mov al, %$p
+  mov [video_page], al
+  int 10h
+?endfunc
+
+%endif ; IMPORTED_video_select_page
+%endif ; IMPORT_video_select_page
+
+
+;;;;;;;;;;;;
+; video_row
+;;;;;;;;;;;;
+
+%ifdef IMPORT_video_row
+%ifndef IMPORTED_video_row
+%define IMPORTED_video_row
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_row
+  ?local %$r
+  mov ah, 03h
+  mov bh, [video_page]
+  int 10h
+  mov word %$r, 0
+  mov %$r, dh
+?endfunc %$r
+
+%endif ; IMPORTED_video_row
+%endif ; IMPORT_video_row
+
+
+;;;;;;;;;;;;
+; video_col
+;;;;;;;;;;;;
+
+%ifdef IMPORT_video_col
+%ifndef IMPORTED_video_col
+%define IMPORTED_video_col
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_col
+  ?local %$c
+  mov ah, 03h
+  mov bh, [video_page]
+  int 10h
+  mov word %$c, 0
+  mov %$c, dl
+?endfunc %$c
+
+%endif ; IMPORTED_video_col
+%endif ; IMPORT_video_col
+
+
+;;;;;;;;;;;;
+; video_pos
+;;;;;;;;;;;;
+
+%ifdef IMPORT_video_pos
+%ifndef IMPORTED_video_pos
+%define IMPORTED_video_pos
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_pos
+  ?local %$r, %$c
+  mov ah, 03h
+  mov bh, [video_page]
+  int 10h
+  mov word %$r, 0
+  mov %$r, dh
+  mov word %$c, 0
+  mov %$c, dl
+?endfunc %$r, %$c
+
+%endif ; IMPORTED_video_pos
+%endif ; IMPORT_video_pos
+
+
+;;;;;;;;;;;;;;;
+; video_setpos
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_setpos
+%ifndef IMPORTED_video_setpos
+%define IMPORTED_video_setpos
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_setpos, %$r, %$c
+  mov ah, 02h
+  mov bh, [video_page]
+  mov dh, %$r
+  mov dl, %$c
+  int 10h
+?endfunc
+
+%endif ; IMPORTED_video_setpos
+%endif ; IMPORT_video_setpos
+
+
+;;;;;;;;;;;;;;;;;;;
+; video_setpos_rel
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_setpos_rel
+%ifndef IMPORTED_video_setpos_rel
+%define IMPORTED_video_setpos_rel
+
+?import video_pos, video_setpos
+%include "kernel/video.qdt"
+
+?func video_setpos_rel, %$dr, %$dc
+  ?local %$r, %$c
+  ? =, %$c, =, %$r, call, video_pos
+  ? call, video_setpos, +, %$dr, %$r, +, %$dc, %$c
+?endfunc
+
+%endif ; IMPORTED_video_rel
+%endif ; IMPORT_video_rel
+
+
+;;;;;;;;;;;;;;;
+; video_setrow
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_setrow
+%ifndef IMPORTED_video_setrow
+%define IMPORTED_video_setrow
+
+?import video_pos, video_setpos
+%include "kernel/video.qdt"
+
+?func video_setrow, %$row
+  ?local %$r, %$c
+  ? =, %$c, =, %$r, call, video_pos
+  ? call, video_setpos, %$row, %$c
+?endfunc
+
+%endif ; IMPORTED_video_setrow
+%endif ; IMPORT_video_setrow
+
+
+;;;;;;;;;;;;;;;;;;;;
+; video_setrow_cent
+;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_setrow_cent
+%ifndef IMPORTED_video_setrow_cent
+%define IMPORTED_video_setrow_cent
+
+?import video_setrow, video_win_rows
+%include "kernel/video.qdt"
+
+?func video_setrow_cent
+  ? call, video_setrow, dec, >>, [video_win_rows], 1
+?endfunc
+
+%endif ; IMPORTED_video_setrow_cent
+%endif ; IMPORT_video_setrow_cent
+
+
+;;;;;;;;;;;;;;;
+; video_setcol
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_setcol
+%ifndef IMPORTED_video_setcol
+%define IMPORTED_video_setcol
+
+?import video_pos, video_setpos
+%include "kernel/video.qdt"
+
+?func video_setcol, %$col
+  ?local %$r, %$c
+  ? =, %$c, =, %$r, call, video_pos
+  ? call, video_setpos, %$r, %$col
+?endfunc
+
+%endif ; IMPORTED_video_setcol
+%endif ; IMPORT_video_setcol
+
+
+;;;;;;;;;;;;;;;;;;;;
+; video_setcol_cent
+;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_setcol_cent
+%ifndef IMPORTED_video_setcol_cent
+%define IMPORTED_video_setcol_cent
+
+?import video_setcol, video_win_cols
+%include "kernel/video.qdt"
+
+?func video_setcol_cent
+  ? call, video_setcol, dec, >>, [video_win_cols], 1
+?endfunc
+
+%endif ; IMPORTED_video_setcol_cent
+%endif ; IMPORT_video_setcol_cent
+
+
+;;;;;;;;;;;;;;;;;
+; video_next_col
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_next_col
+%ifndef IMPORTED_video_next_col
+%define IMPORTED_video_next_col
+
+?import video_pos, video_win_maxcol, video_win_mincol, video_setpos, \
+  video_scroll_up_win
+%include "kernel/video.qdt"
+
+?func video_next_col
+  ?local %$row, %$col
+  ? =, %$col, =, %$row, call, video_pos
+  ?if <, %$$col, [video_win_maxcol]
+    ? ++, %$$col
+  ?elseif <, %$$row, [video_win_maxrow]
+    ?  =, %$$col, [video_win_mincol]
+    ? ++, %$$row
+  ?else
+    ? =, %$$col, [video_win_mincol]
+    ? call, video_scroll_up_win, 1
+  ?endif
+  ? call, video_setpos, %$row, %$col
+?endfunc
+
+%endif ; IMPORTED_next_col
+%endif ; IMPORT_next_col
+
+
+;;;;;;;;;;;;;;;;;
+; video_next_row
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_next_row
+%ifndef IMPORTED_video_next_row
+%define IMPORTED_video_next_row
+
+?import video_row, video_win_mincol, video_win_maxrow, video_scroll_up_win, \
+  video_setpos
+%include "kernel/video.qdt"
+
+?func video_next_row
+  ?local %$row, %$col
+  ? =, %$row, call, video_row
+  ? =, %$col, [video_win_mincol]
+  ?if <, %$$row, [video_win_maxrow]
+    ? ++, %$$row,
+  ?else
+    ? call, video_scroll_up_win, 1
+  ?endif
+  ? call, video_setpos, %$row, %$col
+?endfunc
+
+%endif ; IMPORTED_next_row
+%endif ; IMPORT_next_row
+
+
+;;;;;;;;;;;;;;;;;
+; video_prev_col
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_prev_col
+%ifndef IMPORTED_video_prev_col
+%define IMPORTED_video_prev_col
+
+?import video_pos, video_win_mincol, video_win_maxcol, video_setpos
+%include "kernel/video.qdt"
+
+?func video_prev_col
+  ?local %$row, %$col
+  ? =, %$col, =, %$row, call, video_pos
+  ?if >, %$$col, [video_win_mincol]
+    ? --, %$$col
+  ?elseif >, %$$row, [video_win_minrow]
+    ?  =, %$$col, [video_win_maxcol]
+    ? --, %$$row
+  ?else
+    ?return
+  ?endif
+  ? call, video_setpos, %$row, %$col
+?endfunc
+
+%endif ; IMPORTED_prev_col
+%endif ; IMPORT_prev_col
+
+
+;;;;;;;;;;;;;;;;;
+; video_prev_row
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_prev_row
+%ifndef IMPORTED_video_prev_row
+%define IMPORTED_video_prev_row
+
+?import video_pos, video_win_minrow, video_setpos
+%include "kernel/video.qdt"
+
+?func video_prev_row
+  ?local %$row, %$col
+  ? =, %$col, =, %$row, call, video_pos
+  ?if >, %$$row, [video_win_minrow]
+    ? --, %$$row
+  ?else
+    ?return
+  ?endif
+  ? call, video_setpos, %$row, %$col
+?endfunc
+
+%endif ; IMPORTED_prev_row
+%endif ; IMPORT_prev_row
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; video_scroll_up_win
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_scroll_up_win
+%ifndef IMPORTED_video_scroll_up_win
+%define IMPORTED_video_scroll_up_win
+
+?import video_win_color, video_win_minrow, video_win_mincol, \
+  video_win_maxrow, video_win_maxcol, video_setpos_rel
+%include "kernel/video.qdt"
+
+?func video_scroll_up_win, %$rows
+  mov ah, 06h
+  mov al, %$rows
+  mov bh, [video_win_color]
+  mov ch, [video_win_minrow]
+  mov cl, [video_win_mincol]
+  mov dh, [video_win_maxrow]
+  mov dl, [video_win_maxcol]
+  int 10h
+
+  ? call, video_setpos_rel, neg, %$rows, 0
+?endfunc
+
+%endif ; IMPORTED_scroll_up_win
+%endif ; IMPORT_scroll_up_win
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; video_scroll_down_win
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_scroll_down_win
+%ifndef IMPORTED_video_scroll_down_win
+%define IMPORTED_video_scroll_down_win
+
+?import video_win_color, video_win_minrow, video_win_mincol, \
+  video_win_maxrow, video_win_maxcol, video_setpos_rel
+%include "kernel/video.qdt"
+
+?func video_scroll_down_win, %$rows
+  mov ah, 07h
+  mov al, %$rows
+  mov bh, [video_win_color]
+  mov ch, [video_win_minrow]
+  mov cl, [video_win_mincol]
+  mov dh, [video_win_maxrow]
+  mov dl, [video_win_maxcol]
+  int 10h
+
+  ? call, video_setpos_rel, %$rows, 0
+?endfunc
+
+%endif ; IMPORTED_video_scroll_down_win
+%endif ; IMPORT_video_scroll_down_win
+
+
+;;;;;;;;;;;;
+; video_cls
+;;;;;;;;;;;;
+
+%ifdef IMPORT_video_cls
+%ifndef IMPORTED_video_cls
+%define IMPORTED_video_cls
+
+?import video_win_rows, video_scroll_up_win, video_setpos
+%include "kernel/video.qdt"
+
+?func video_cls
+  ? call, video_scroll_up_win, [video_win_rows]
+  ? call, video_setpos, [video_win_minrow], [video_win_mincol]
+?endfunc
+
+%endif ; IMPORTED_video_cls
+%endif ; IMPORT_video_cls
+
+
+;;;;;;;;;;;;;;;;;;;;;
+; video_cent_str_row
+;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_cent_str_row
+%ifndef IMPORTED_video_cent_str_row
+%define IMPORTED_video_cent_str_row
+
+?import video_cent_str_row, video_win_rows
+%include "kernel/video.qdt"
+
+?import memory_strheight
+%include "kernel/memory.qdt"
+
+?func video_cent_str_row, %$str
+?endfunc >>, -, [video_win_rows], \
+                call, memory_strheight, %$str, \
+             1
+
+%endif ; IMPORTED_video_cent_str_row
+%endif ; IMPORT_video_cent_str_row
+
+
+;;;;;;;;;;;;;;;;;;;;;
+; video_cent_str_col
+;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_cent_str_col
+%ifndef IMPORTED_video_cent_str_col
+%define IMPORTED_video_cent_str_col
+
+?import video_win_coord
+%include "kernel/video.qdt"
+
+?import memory_strwidth
+%include "kernel/memory.qdt"
+
+?func video_cent_str_col, %$str
+?endfunc >>, -, [video_win_cols], \
+                call, memory_strwidth, %$str, \
+             1
+
+%endif ; IMPORTED_video_cent_str_col
+%endif ; IMPORT_video_cent_str_col
+
+
+;;;;;;;;;;;;;;;;;;
+; video_read_char
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_read_char
+%ifndef IMPORTED_video_read_char
+%define IMPORTED_video_read_char
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_read_char
+  ?local %$char, %$color
+  mov word %$char, 0
+  mov word %$color, 0
+  mov ah, 08h
+  mov bh, [video_page]
+  int 10h
+  mov %$char, al
+  mov %$color, ah
+?endfunc %$char, %$color
+
+%endif ; IMPORTED_video_read_char
+%endif ; IMPORT_video_read_char
+
+
+;;;;;;;;;;;;;;;;;;
+; video_draw_char
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_draw_char
+%ifndef IMPORTED_video_draw_char
+%define IMPORTED_video_draw_char
+
+?import video_page
+%include "kernel/video.qdt"
+
+?func video_draw_char, %$char, %$color, %$count
+  mov al, %$char
+  mov ah, 09h
+  mov bl, %$color
+  mov bh, [video_page]
+  mov cx, %$count
+  int 10h
+?endfunc
+
+%endif ; IMPORTED_video_draw_char
+%endif ; IMPORT_video_draw_char
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; video_draw_char_hfull
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_draw_char_hfull
+%ifndef IMPORTED_video_draw_char_hfull
+%define IMPORTED_video_draw_char_hfull
+
+?import video_setpos_rel, video_setcol, video_draw_char, \
+  video_win_cols, video_next_row
+%include "kernel/video.qdt"
+
+?func video_draw_char_hfull, %$char, %$color, %$dy0, %$dy1
+  ?local %$i
+  ? call, video_setpos_rel, %$dy0, 0
+  ?for =, %$$i, 0
+    ?cond <=, %$$i, abs, -, %$$dy1, %$$dy0
+    ?if >, %$$i, 0
+      ? call, video_next_row
+    ?endif
+    ? call, video_setcol, 0
+    ? call, video_draw_char, %$$char, %$$color, [video_win_cols]
+  ?next ++, %$$i
+?endfunc
+
+%endif ; IMPORTED_video_draw_char_hfull
+%endif ; IMPORT_video_draw_char_hfull
+
+
+;;;;;;;;;;;;;;;;;
+; video_draw_str
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_draw_str
+%ifndef IMPORTED_video_draw_str
+%define IMPORTED_video_draw_str
+
+?import video_col, video_pos, video_setcol, video_next_row, \
+  video_next_col, video_draw_char
+%include "kernel/video.qdt"
+
+?import LF, END, COLOR_ESC, memory_strlen
+%include "kernel/memory.qdt"
+
+?func video_draw_str, %$str, %$color
+  ?local %$i, %$startcol, %$strlen, %$char
+  ? =, %$startcol, call, video_col
+  ? =, %$strlen, call, memory_strlen, %$str
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ? =, %$$char, @byte, +, %$$str, %$$i
+    ?switch %$$$char
+      ?case ==, COLOR_ESC
+        ? ++, %$$$i
+        ? =, %$$$color, @byte, +, %$$$str, %$$$i
+      ?case ==, LF
+        ?if !=, END, @byte, +, %$$$$str, inc, %$$$$i
+          ? call, video_next_row
+          ? call, video_setcol, %$$$$startcol
+        ?endif
+      ?default
+        ? call, video_draw_char, %$$$char, %$$$color, 1
+        ? call, video_next_col
+    ?endswitch
+  ?next ++, %$$i
+?endfunc
+
+%endif ; IMPORTED_video_draw_str
+%endif ; IMPORT_video_draw_str
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; video_draw_str_hcent
+;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_draw_str_hcent
+%ifndef IMPORTED_video_draw_str_hcent
+%define IMPORTED_video_draw_str_hcent
+
+?import video_setpos, video_cent_str_col, video_draw_str
+%include "kernel/video.qdt"
+
+?func video_draw_str_hcent, %$str, %$color
+  ? call, video_setcol, \
+      call, video_cent_str_col, %$str
+  ? call, video_draw_str, %$str, %$color
+?endfunc
+
+%endif ; IMPORTED_video_draw_str_hcent
+%endif ; IMPORT_video_draw_str_hcent
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; video_draw_str_vhcent
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_video_draw_str_vhcent
+%ifndef IMPORTED_video_draw_str_vhcent
+%define IMPORTED_video_draw_str_vhcent
+
+?import video_setpos, video_cent_str_row, video_cent_str_col, \
+  video_draw_str
+%include "kernel/video.qdt"
+
+?func video_draw_str_vhcent, %$str, %$color
+  ? call, video_setpos, \
+      call, video_cent_str_row, %$str, \
+      call, video_cent_str_col, %$str
+  ? call, video_draw_str, %$str, %$color
+?endfunc
+
+%endif ; IMPORTED_video_draw_str_vhcent
+%endif ; IMPORT_video_draw_str_vhcent
+
+
+
+%pop KERNEL_VIDEO_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

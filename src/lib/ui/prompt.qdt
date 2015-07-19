@@ -1,0 +1,134 @@
+;
+; prompt.qdt -- user interface prompts;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push UI_PROMPT_QDT
+
+
+;;;;;;;;;;;;;;;;;;
+; prompt_read_str
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_prompt_read_str
+%ifndef IMPORTED_prompt_read_str
+%define IMPORTED_prompt_read_str
+
+?import video_draw_str
+%include "kernel/video.qdt"
+
+?import keyboard_read_str
+%include "kernel/keyboard.qdt"
+
+?func prompt_read_str, %$str, %$buffer, %$max, %$color, %$outchar
+   ? call, video_draw_str, %$str, %$color
+   ? call, keyboard_read_str, %$buffer, %$max, %$color, %$outchar
+?endfunc
+
+%endif ; IMPORTED_prompt_read_str
+%endif ; IMPORT_prompt_read_str
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+; prompt_read_str_vhcent
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_prompt_read_str_vhcent
+%ifndef IMPORTED_prompt_read_str_vhcent
+%define IMPORTED_prompt_read_str_vhcent
+
+?import video_setpos, video_cent_str_row, video_cent_str_col, \
+  video_setpos_rel
+%include "kernel/video.qdt"
+
+?import prompt_read_str
+%include "ui/prompt.qdt"
+
+?func prompt_read_str_vhcent, %$dy, %$dx, %$str, %$buffer, %$max, \
+  %$color, %$outchar
+  ? call, video_setpos, \
+      call, video_cent_str_row, %$str, \
+      -, call, video_cent_str_col, %$str, \
+         >>, %$max, 1
+  ? call, video_setpos_rel, %$dy, %$dx
+  ? call, prompt_read_str, %$str, %$buffer, %$max, %$color, %$outchar
+?endfunc
+
+%endif ; IMPORTED_prompt_read_str_vhcent
+%endif ; IMPORT_prompt_read_str_vhcent
+
+
+;;;;;;;;;;;;;;;;;;;
+; prompt_yes_or_no
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_prompt_yes_or_no
+%ifndef IMPORTED_prompt_yes_or_no
+%define IMPORTED_prompt_yes_or_no
+
+?import memory_uppercase_char
+%include "kernel/memory.qdt"
+
+?import video_next_row, video_draw_str, video_enable_cursor, \
+  video_draw_char, video_disable_cursor
+%include "kernel/video.qdt"
+
+?import keyboard_read_char, RETURN
+%include "kernel/keyboard.qdt"
+
+?import speaker_beep
+%include "kernel/speaker.qdt"
+
+?func prompt_yes_or_no, %$question, %$char_yes, %$char_no, \
+  %$char_default, %$color
+  ?local %$input_char, %$acceptable_char
+  ? =, %$char_yes, call, memory_uppercase_char, %$char_yes
+  ? =, %$char_no, call, memory_uppercase_char, %$char_no
+  ? =, %$char_default, call, memory_uppercase_char, %$char_default
+  ? call, video_draw_str, %$question, %$color
+  ? call, video_enable_cursor
+  ? =, %$acceptable_char, %$char_default
+  ? call, video_draw_char, %$acceptable_char, %$color, 1
+  ?do
+    ? =, %$$input_char, call, keyboard_read_char
+    ? =, %$$input_char, call, memory_uppercase_char, %$$input_char
+    ?if &&, &&, !=, %$$$input_char, %$$$char_yes, \
+                !=, %$$$input_char, %$$$char_no, \
+            !=, %$$$input_char, RETURN
+      ? call, speaker_beep, 440, 1
+    ?elseif !=, %$$$input_char, RETURN
+      ? =, %$$$acceptable_char, %$$$input_char
+      ? call, video_draw_char, %$$$acceptable_char, %$$$color, 1
+    ?endif
+  ?while !=, %$$input_char, RETURN
+  ? call, video_disable_cursor
+  ?if ==, %$acceptable_char, %$char_yes
+    ?return TRUE
+  ?else
+    ?return FALSE
+  ?endif
+?endfunc
+
+%endif ; IMPORTED_prompt_yes_or_no
+%endif ; IMPORT_prompt_yes_or_no
+
+
+%pop UI_PROMPT_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

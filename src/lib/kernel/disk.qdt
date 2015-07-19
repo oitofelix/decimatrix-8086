@@ -1,0 +1,143 @@
+;
+; disk.qdt -- disk facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_DISK_QDT
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; disk_get_parameters
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_disk_get_parameters
+%ifndef IMPORTED_disk_get_parameters
+%define IMPORTED_disk_get_parameters
+
+?func disk_get_parameters, %$disk
+  ?local %$sectors_per_track, %$tracks_per_cylinder
+
+  mov word %$sectors_per_track, 0
+  mov word %$tracks_per_cylinder, 0
+
+  mov ah, 08h
+  mov dl, %$disk
+  mov di, 00h
+  push es
+  mov es, di
+  int 13h
+  pop es
+
+  and cl, 00111111b
+  mov %$sectors_per_track, cl
+
+  inc dh
+  mov %$tracks_per_cylinder, dh
+
+?endfunc %$sectors_per_track, %$tracks_per_cylinder
+
+%endif ; IMPORTED_disk_get_parameters
+%endif ; IMPORT_disk_get_parameters
+
+
+;;;;;;;;;;;;;;;;;;;;;
+; disk_sector_to_chs
+;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_disk_sector_to_chs
+%ifndef IMPORTED_disk_sector_to_chs
+%define IMPORTED_disk_sector_to_chs
+
+?import disk_get_parameters
+%include "kernel/disk.qdt"
+
+?func disk_sector_to_chs, %$disk, %$sector
+  ?local %$spt, %$tpc, %$c, %$h, %$s
+
+  mov word %$h, 0
+  mov word %$s, 0
+
+  ? =, %$tpc, =, %$spt, call, disk_get_parameters, %$disk
+
+  mov bh, 0
+  mov ax, %$sector
+  mov dx, 0
+  mov bl, %$spt
+  div bx
+  inc dl
+  mov %$s, dl
+  mov dx, 0
+  mov bl, %$tpc
+  div bx
+  mov %$c, ax
+  mov %$h, dl
+?endfunc %$c, %$h, %$s
+
+%endif ; IMPORTED_disk_sector_to_chs
+%endif ; IMPORT_disk_sector_to_chs
+
+
+;;;;;;;;;;;;;;;;;;;;
+; disk_read_sectors
+;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_disk_read_sectors
+%ifndef IMPORTED_disk_read_sectors
+%define IMPORTED_disk_read_sectors
+
+?import disk_sector_to_chs
+%include "kernel/disk.qdt"
+
+?func disk_read_sectors, %$buffer_segment, %$buffer_offset, %$disk, \
+  %$start_sector, %$count
+  ?local %$c, %$h, %$s
+
+  %$read_loop:
+    ? =, %$s, =, %$h, =, %$c, \
+      call, disk_sector_to_chs, %$disk, %$start_sector
+
+    mov ax, %$c
+    mov ch, al
+    mov cl, 6
+    shr ah, cl
+    mov cl, %$s
+    or cl, ah
+    mov dh, %$h
+
+    mov bx, %$buffer_segment
+    mov es, bx
+    mov bx, %$buffer_offset
+
+    mov dl, %$disk
+    mov ax, 0201h
+    int 13h
+
+    inc word %$start_sector
+    add word %$buffer_offset, 512
+    dec word %$count
+    jnz %$read_loop
+?endfunc
+
+%endif ; IMPORTED_disk_read_sectors
+%endif ; IMPORT_disk_read_sectors
+
+
+%pop KERNEL_DISK_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

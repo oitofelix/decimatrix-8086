@@ -1,0 +1,65 @@
+;
+; speaker.qdt -- speaker facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_SPEAKER_QDT
+
+
+;;;;;;;;;;;;;;;
+; speaker_beep
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_speaker_beep
+%ifndef IMPORTED_speaker_beep
+%define IMPORTED_speaker_beep
+
+?import timer_sleep
+%include "kernel/timer.qdt"
+
+?func speaker_beep, %$frequency, %$duration
+  mov al, 10110110b
+  out 43h, al
+
+  mov ax, 34DEh
+  mov dx, 12h
+  div word %$frequency
+
+  out 42h, al
+  mov al, ah
+  out 42h, al
+
+  in al, 61h
+  or al, 00000011b
+  out 61h, al
+
+  ? call, timer_sleep, %$duration
+
+  in al, 61h
+  and al, 11111100b
+  out 61h, al
+?endfunc
+
+%endif ; IMPORTED_speaker_beep
+%endif ; IMPORT_speaker_beep
+
+
+%pop KERNEL_SPEAKER_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

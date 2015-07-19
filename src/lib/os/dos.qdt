@@ -1,0 +1,65 @@
+;
+; dos.qdt -- DOS facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push OS_DOS_QDT
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; dos_check_if_running
+;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_dos_check_if_running
+%ifndef IMPORTED_dos_check_if_running
+%define IMPORTED_dos_check_if_running
+
+?func dos_check_if_running
+  mov ax, 3000h
+  int 21h
+  cmp al, 00h
+  jz %$not_running
+  ?return TRUE
+  %$not_running:
+?endfunc FALSE
+
+%endif ; IMPORTED_dos_check_if_running
+%endif ; IMPORT_dos_check_if_running
+
+
+;;;;;;;;;;;
+; dos_exit
+;;;;;;;;;;;
+
+%ifdef IMPORT_dos_exit
+%ifndef IMPORTED_dos_exit
+%define IMPORTED_dos_exit
+
+?func dos_exit
+  mov ah, 4Ch
+  int 21h
+?endfunc
+
+%endif ; IMPORTED_dos_exit
+%endif ; IMPORT_dos_exit
+
+
+%pop OS_DOS_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

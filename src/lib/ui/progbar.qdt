@@ -1,0 +1,152 @@
+;
+; progbar.qdt -- Progress bar;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push UI_PROGBAR_QDT
+
+
+;;;;;;;;;;;;;;;
+; progbar_draw
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_progbar_draw
+%ifndef IMPORTED_progbar_draw
+%define IMPORTED_progbar_draw
+
+?import video_draw_char, video_setpos_rel, video_pos, color, BLACK, \
+  RED, DARK_GRAY, GREEN, LIGHT_GREEN, YELLOW, LIGHT_RED
+%include "kernel/video.qdt"
+
+?import random_number
+%include "math/random.qdt"
+
+?import timer_sleep
+%include "kernel/timer.qdt"
+
+?func progbar_draw, %$size, %$ticks, %$callback, %$callback_data, \
+  %$numcalls
+  ?local %$first_third, %$second_third, %$ticks_for_next_call, \
+    %$block_counter, %$call_counter, %$color, %$r, %$c, %$rnd
+
+  ? call, video_draw_char, '[', color(RED,BLACK), 1
+  ? call, video_setpos_rel, 0, 1
+  ? call, video_draw_char, 'þ', color(DARK_GRAY,BLACK), %$size
+  ? call, video_setpos_rel, 0, %$size
+  ? call, video_draw_char, ']', color(GREEN,BLACK), 1
+  ? call, video_setpos_rel, 0, neg, %$size
+
+  ? =, %$first_third, /, %$size, 3
+  ? =, %$second_third, <<, %$first_third, 1
+
+  ? =, %$call_counter, %$numcalls
+  ? =, %$ticks_for_next_call, 0
+  ? =, %$color, color(LIGHT_RED,BLACK)
+
+  ?for =, %$$block_counter, %$$size
+    ?cond <, 0, %$$block_counter
+
+    ?if &&, <=-, %$$$ticks_for_next_call, 0, \
+            >, %$$$call_counter, 0
+      ? =, %$$$c, =, %$$$r, call, video_pos
+      ? dcall, %$$$callback, %$$$callback_data, \
+                 -, %$$$numcalls, %$$$call_counter, %$$$color
+      ? call, video_setpos, %$$$r, %$$$c
+      ? +=, %$$$ticks_for_next_call, \
+           /, %$$$ticks, $--, %$$$call_counter
+    ?endif
+
+    ? =, %$$rnd, call, random_number, 0, \
+                  +, /, %$$ticks, %$$block_counter, \
+                     %, %$$ticks, %$$block_counter
+    ? -=, %$$ticks, %$$rnd
+    ? -=, %$$ticks_for_next_call, %$$rnd
+    ? call, timer_sleep, %$$rnd
+
+    ?if <=, %$$$block_counter, %$$$first_third
+      ? =, %$$$color, color(LIGHT_GREEN,BLACK)
+    ?elseif <=, %$$$block_counter, %$$$second_third
+      ? =, %$$$color, color(YELLOW,BLACK)
+    ?else
+      ? =, %$$$color, color(LIGHT_RED,BLACK)
+    ?endif
+
+    ? call, video_draw_char, 'þ', %$$color, 1
+    ? call, video_setpos_rel, 0, 1
+  ?next --, %$$block_counter
+  ? call, timer_sleep, %$ticks
+?endfunc
+
+%endif ; IMPORTED_progbar_draw
+%endif ; IMPORT_progbar_draw
+
+
+;;;;;;;;;;;;;;;;;;;;;
+; progbar_draw_hfull
+;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_progbar_draw_hfull
+%ifndef IMPORTED_progbar_draw_hfull
+%define IMPORTED_progbar_draw_hfull
+
+?import progbar_draw
+%include "ui/progbar.qdt"
+
+?import video_setcol
+%include "kernel/video.qdt"
+
+?func progbar_draw_hfull, %$ticks, %$callback, %$callback_data, \
+  %$numcalls
+  ? call, video_setcol, 0
+  ? call, progbar_draw, -, [video_win_cols], 2, \
+            %$ticks, %$callback, %$callback_data, %$numcalls
+?endfunc
+
+%endif ; IMPORTED_progbar_draw_hfull
+%endif ; IMPORT_progbar_draw_hfull
+
+
+;;;;;;;;;;;;;;;;;
+; progbar_draw_r
+;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_progbar_draw_r
+%ifndef IMPORTED_progbar_draw_r
+%define IMPORTED_progbar_draw_r
+
+?import progbar_draw
+%include "ui/progbar.qdt"
+
+?import video_setcol, video_win_cols
+%include "kernel/video.qdt"
+
+?func progbar_draw_r, %$size, %$ticks, %$callback, %$callback_data, \
+  %$numcalls
+  ? call, video_setcol, -, [video_win_cols], +, %$size, 2
+  ? call, progbar_draw, %$size, %$ticks, %$callback, \
+      %$callback_data, %$numcalls
+?endfunc
+
+%endif ; IMPORTED_progbar_draw_r
+%endif ; IMPORT_progbar_draw_r
+
+
+%pop UI_PROGBAR_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

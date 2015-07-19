@@ -1,0 +1,214 @@
+;
+; func.qdot -- QDot function definition, importing and calling;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%ifndef QDOT_FUNCTION_ASM
+%define QDOT_FUNCTION_ASM
+%push QDOT_FUNCTION_ASM
+
+
+;;;;;;;;;;;;;;
+; ?func
+;;;;;;;;;;;;;;
+
+%macro ?func 1-*
+  %ifctx ?func
+    %error "Previous function definition missing '?endfunc'"
+  %endif
+  %1:
+  %push ?func
+  %xdefine func_name %1
+  %assign %$func_numargs %0 - 1
+  %assign %$func_numlocals 0
+  %assign %$qdot_nesting 0
+  %if %0 == 1
+    func_define_parameters
+  %else
+    func_define_parameters %{2:-1}
+  %endif
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; ?lfunc
+;;;;;;;;;;;;;;
+
+%macro ?lfunc 1-*
+  %ifctx ?func
+    %error "Previous function definition missing '?endfunc'"
+  %endif
+  %$ %+ %1:
+  %push ?func
+  %xdefine func_name %1
+  %assign %$func_numargs %0 - 1
+  %assign %$func_numlocals 0
+  %assign %$qdot_nesting 0
+  %if %0 == 1
+    func_define_parameters
+  %else
+    func_define_parameters %{2:-1}
+  %endif
+%endmacro
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+; func_define_parameters
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+%macro func_define_parameters 0-*
+  push bp
+  mov bp, sp
+  %assign i 2 ; accounts for 'push bp'
+  %rep %0
+    %assign i i + 2
+    %xdefine %1 [bp + i]
+    %rotate 1
+  %endrep
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; ?local
+;;;;;;;;;;;;;;
+
+%macro ?local 1-*
+  %assign %$func_numlocals %0
+  %assign i 0
+  %rep %0
+    %assign i i + 2
+    %xdefine %1 [bp - i]
+    %rotate 1
+  %endrep
+  sub sp, i
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; movarg
+;;;;;;;;;;;;;;
+
+; %macro ?movarg 2
+;   push si
+;   mov si, %2
+;   inc si
+;   shl si, 1
+;   mov %1, [bp + si]
+;   pop si
+; %endmacro
+
+
+;;;;;;;;;;;;;;
+; argument
+;;;;;;;;;;;;;;
+
+%define ?argument(i) [bp + (i + 1) * 2]
+
+
+;;;;;;;;;;;;;;
+; ?return
+;;;;;;;;;;;;;;
+
+%macro ?return 0-1+
+  ? %1
+  jmp %[func_name].end
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; ?endfunc
+;;;;;;;;;;;;;;
+
+%macro ?endfunc 0-1+
+  %ifnctx ?func
+    %error "Expected '?func' before '?endfunc'"
+  %endif
+
+  ? %1
+
+  .end:
+    mov bh, %$func_numlocals
+    mov bl, %$func_numargs
+    jmp qdot_func_ret
+
+    %ifndef ?endfunc_qdot_func_ret
+    %define ?endfunc_qdot_func_ret
+      qdot_func_ret:
+        mov ax, [bp] ; old bp
+        mov dx, [bp + 2] ; old ip
+
+        mov cx, bp
+
+        push bx
+        mov bl, bh
+        mov bh, 0
+        shl bx, 1
+        sub cx, bx
+        pop bx
+
+        mov si, cx
+        sub si, 2
+        sub cx, sp
+        push cx
+        shr cx, 1
+
+        mov di, bp
+
+        mov bh, 0
+        shl bx, 1
+        add bx, 2
+        add di, bx
+
+        push di
+
+        std
+        rep movsw
+
+        pop di
+        pop cx
+
+        add di, 2
+        sub di, cx
+        mov sp, di
+
+        mov bp, ax
+        push dx
+        ret
+    %endif ; qdot_func_ret
+
+    %pop ?func
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; ?import
+;;;;;;;;;;;;;;
+
+%macro ?import 1-*
+  %rep %0
+    %define IMPORT_%[%1]
+    %rotate 1
+  %endrep
+%endmacro
+
+
+%pop QDOT_FUNCTION_ASM
+%endif ; QDOT_FUNCTION_ASM
+
+; Local Variables:
+; coding: cp437-dos
+; End:

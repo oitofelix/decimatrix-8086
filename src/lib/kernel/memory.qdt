@@ -1,0 +1,492 @@
+;
+; memory.qdt -- memory facilities;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push KERNEL_MEMORY_QDT
+
+;;;;;
+; LF
+;;;;;
+
+%ifdef IMPORT_LF
+%ifndef IMPORTED_LF
+%define IMPORTED_LF
+
+LF equ 0Ah
+
+%endif ; IMPORTED_LF
+%endif ; IMPORT_LF
+
+
+;;;;;;
+; END
+;;;;;;
+
+%ifdef IMPORT_END
+%ifndef IMPORTED_END
+%define IMPORTED_END
+
+END equ 00h
+
+%endif ; IMPORTED_END
+%endif ; IMPORT_END
+
+
+;;;;;;;;;;;;
+; COLOR_ESC
+;;;;;;;;;;;;
+
+%ifdef IMPORT_COLOR_ESC
+%ifndef IMPORTED_COLOR_ESC
+%define IMPORTED_COLOR_ESC
+
+COLOR_ESC equ 01h
+
+%endif ; IMPORTED_COLOR_ESC
+%endif ; IMPORT_COLOR_ESC
+
+
+;;;;;;;;;
+; string
+;;;;;;;;;
+
+%ifdef IMPORT_string
+%ifndef IMPORTED_string
+%define IMPORTED_string
+
+?import END
+%include "kernel/memory.qdt"
+
+%macro string 1+
+  db %1, END
+%endmacro
+
+%endif ; IMPORTED_string
+%endif ; IMPORT_string
+
+
+;;;;;;;
+; row
+;;;;;;;
+
+%ifdef IMPORT_row
+%ifndef IMPORTED_row
+%define IMPORTED_row
+
+?import LF
+%include "kernel/memory.qdt"
+
+%macro row 1+
+  db %1, LF
+%endmacro
+
+%endif ; IMPORTED_row
+%endif ; IMPORT_row
+
+
+;;;;;;;;;;;;;;;;
+; memory_strlen
+;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_strlen
+%ifndef IMPORTED_memory_strlen
+%define IMPORTED_memory_strlen
+
+?import END
+%include "kernel/memory.qdt"
+
+?func memory_strlen, %$str
+  ?local %$i
+  ?for =, %$$i, 0
+    ?cond !=, END, @byte, +, %$$str, %$$i
+  ?next ++, %$$i
+?endfunc %$i
+
+%endif ; IMPORTED_memory_strlen
+%endif ; IMPORT_memory_strlen
+
+
+;;;;;;;;;;;;;;;;;;
+; memory_strwidth
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_strwidth
+%ifndef IMPORTED_memory_strwidth
+%define IMPORTED_memory_strwidth
+
+?import END, LF, memory_strlen
+%include "kernel/memory.qdt"
+
+?func memory_strwidth, %$str
+  ?local %$max_width, %$curr_width, %$strlen, %$i
+  ? =, %$max_width, 0
+  ? =, %$curr_width, 0
+  ? =, %$strlen, call, memory_strlen, %$str
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ?switch @byte, +, %$$$str, %$$$i
+      ?case ==, COLOR_ESC
+        ? ++, %$$$i
+      ?case ==, LF
+        ? =, %$$$max_width, max, %$$$max_width, %$$$curr_width
+        ? =, %$$$curr_width, 0
+      ?default
+        ? ++, %$$$curr_width
+    ?endswitch
+  ?next ++, %$$i
+?endfunc max, %$max_width, %$curr_width
+
+%endif ; IMPORTED_memory_strwidth
+%endif ; IMPORT_memory_strwidth
+
+
+;;;;;;;;;;;;;;;;;;;
+; memory_strheight
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_strheight
+%ifndef IMPORTED_memory_strheight
+%define IMPORTED_memory_strheight
+
+?import LF, END, memory_strlen
+%include "kernel/memory.qdt"
+
+?func memory_strheight, %$str
+  ?local %$height, %$strlen, %$i
+  ? =, %$height, 1
+  ? =, %$strlen, call, memory_strlen, %$str
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ?if &&, ==, LF, \
+                @byte, +, %$$$str, %$$$i, \
+            !=, END, \
+                @byte, +, %$$$str, inc, %$$$i
+      ? ++, %$$$height
+    ?endif
+  ?next ++, %$$i
+?endfunc %$height
+
+%endif ; IMPORTED_memory_strheight
+%endif ; IMPORT_memory_strheight
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; memory_uppercase_char
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_uppercase_char
+%ifndef IMPORTED_memory_uppercase_char
+%define IMPORTED_memory_uppercase_char
+
+?func memory_uppercase_char, %$char
+  ?if &&, >=, %$$char, 'a', \
+          <=, %$$char, 'z'
+    ? -=, %$$char, 20h
+  ?endif
+?endfunc %$char
+
+%endif ; IMPORTED_memory_uppercase_char
+%endif ; IMPORT_memory_uppercase_char
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; memory_uppercase_str
+;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_uppercase_str
+%ifndef IMPORTED_memory_uppercase_str
+%define IMPORTED_memory_uppercase_str
+
+?import memory_strlen, memory_uppercase_char
+%include "kernel/memory.qdt"
+
+?func memory_uppercase_str, %$str
+  ?local %$i, %$strlen
+  ? =, %$strlen, call, memory_strlen, %$str
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ? @byte=, +, %$$str, %$$i, \
+              call, memory_uppercase_char, \
+              @byte, +, %$$str, %$$i
+  ?next ++, %$$i
+?endfunc
+
+%endif ; IMPORTED_memory_uppercase_str
+%endif ; IMPORT_memory_uppercase_str
+
+
+;;;;;;;;;;;;;;;
+; memory_rot47
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_rot47
+%ifndef IMPORTED_memory_rot47
+%define IMPORTED_memory_rot47
+
+?import memory_strlen
+%include "kernel/memory.qdt"
+
+?func memory_rot47, %$str
+  ?local %$i, %$strlen
+  ? =, %$strlen, call, memory_strlen, %$str
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ? @byte=, +, %$$str, %$$i, \
+              +, 33, \
+                 %, +, 14, \
+                       @byte, +, %$$str, %$$i, \
+                    94
+  ?next ++, %$$i
+?endfunc
+
+%endif ; IMPORTED_memory_rot47
+%endif ; IMPORT_memory_rot47
+
+
+;;;;;;;;;;;;;;;
+; memory_streq
+;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_streq
+%ifndef IMPORTED_memory_streq
+%define IMPORTED_memory_streq
+
+?import memory_strlen
+%include "kernel/memory.qdt"
+
+?func memory_streq, %$str0, %$str1
+  ?local %$i, %$strlen
+  ? =, %$strlen, call, memory_strlen, %$str0
+  ?if !=, %$strlen, call, memory_strlen, %$str1
+    ?return FALSE
+  ?endif
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ?if !=, @byte, +, %$$str0, %$$i, \
+            @byte, +, %$$str1, %$$i
+      ?return FALSE
+    ?endif
+  ?next ++, %$$i
+?endfunc TRUE
+
+%endif ; IMPORTED_memory_streq
+%endif ; IMPORT_memory_streq
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; memory_str_char_index
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_str_char_index
+%ifndef IMPORTED_memory_str_char_index
+%define IMPORTED_memory_str_char_index
+
+?import memory_strlen
+%include "kernel/memory.qdt"
+
+?func memory_str_char_index, %$str, %$char
+  ?local %$i, %$strlen
+  ? =, %$strlen, call, memory_strlen, %$str
+  ?for =, %$$i, 0
+    ?cond <, %$$i, %$$strlen
+    ?if ==, @byte, +, %$$str, %$$i, \
+            %$$char
+      ?return %$$$i
+    ?endif
+  ?next ++, %$$i
+?endfunc -1
+
+%endif ; IMPORTED_memory_str_char_index
+%endif ; IMPORT_memory_str_char_index
+
+
+;;;;;;;;;;;;;;;;;;
+; memory_copy_str
+;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_copy_str
+%ifndef IMPORTED_memory_copy_str
+%define IMPORTED_memory_copy_str
+
+?import memory_strlen
+%include "kernel/memory.qdt"
+
+?func memory_copy_str, %$dest, %$orig
+  ?local %$i, %$strlen
+  ? =, %$strlen, call, memory_strlen, %$orig
+  ?for =, %$$i, 0
+    ?cond <=, %$$i, %$$strlen
+    ? @byte=, +, %$$dest, %$$i, @byte, +, %$$orig, %$$i
+  ?next ++, %$$i
+?endfunc
+
+%endif ; IMPORTED_memory_copy_str
+%endif ; IMPORT_memory_copy_str
+
+
+;;;;;;;;;;;;;;;;;;;
+; memory_skip_char
+;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_skip_char
+%ifndef IMPORTED_memory_skip_char
+%define IMPORTED_memory_skip_char
+
+?func memory_skip_char, %$str, %$char
+  ?local %$str_ptr
+  ?for =, %$$str_ptr, %$str
+    ?cond ==, %$$char, @byte, %$$str_ptr
+  ?next ++, %$$str_ptr
+?endfunc %$str_ptr
+
+%endif ; IMPORTED_memory_skip_char
+%endif ; IMPORT_memory_skip_char
+
+
+;;;;;;;;;
+; array
+;;;;;;;;;
+
+%ifdef IMPORT_array
+%ifndef IMPORTED_array
+%define IMPORTED_array
+
+%macro array 0
+  %push array
+%endmacro
+
+%endif ; IMPORTED_array
+%endif ; IMPORT_array
+
+
+;;;;;;;;;;;
+; endarray
+;;;;;;;;;;;
+
+%ifdef IMPORT_endarray
+%ifndef IMPORTED_endarray
+%define IMPORTED_endarray
+
+?import END
+%include "kernel/memory.qdt"
+
+%macro endarray 0
+  db END
+  %pop array
+%endmacro
+
+%endif ; IMPORTED_endarray
+%endif ; IMPORT_endarray
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; memory_charseq_len
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_charseq_len
+%ifndef IMPORTED_memory_charseq_len
+%define IMPORTED_memory_charseq_len
+
+?func memory_charseq_len, %$str, %$char
+  ?local %$i
+  ?for =, %$$i, 0
+    ?cond ==, %$$char, @byte, +, %$$str, %$$i
+  ?next ++, %$$i
+?endfunc %$i
+
+%endif ; IMPORTED_memory_charseq_len
+%endif ; IMPORT_memory_charseq_len
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; memory_array_len
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_array_len
+%ifndef IMPORTED_memory_array_len
+%define IMPORTED_memory_array_len
+
+?import memory_strlen, memory_charseq_len
+%include "kernel/memory.qdt"
+
+?func memory_array_len, %$array, %$dim
+  ?local %$i, %$charseq_len, %$len
+  ? =, %$len, 1
+  ?if ==, 0, %$$dim
+    ?return 0
+  ?elseif ==, 1, %$$dim
+    ?return call, memory_strlen, %$$array
+  ?else
+    ?for =, %$$$i, 0
+      ?cond >, %$$$dim, =$, %$$$charseq_len, \
+                            call, memory_charseq_len, \
+                              +, %$$$array, %$$$i, END
+      ?if ==, dec, %$$$$dim, %$$$$charseq_len
+        ? ++, %$$$$len
+      ?endif
+    ?next ++, %$$$i
+  ?endif
+?endfunc %$len
+
+%endif ; IMPORTED_memory_array_len
+%endif ; IMPORT_memory_array_len
+
+
+;;;;;;;;;;;;;;;;;;;;
+; memory_array_elem
+;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_memory_array_elem
+%ifndef IMPORTED_memory_array_elem
+%define IMPORTED_memory_array_elem
+
+?import memory_strlen, memory_charseq_len
+%include "kernel/memory.qdt"
+
+?func memory_array_elem, %$array, %$dim, %$elem
+  ?local %$i, %$charseq_len
+  ?if ==, 0, %$$dim
+    ?return NULL
+  ?elseif ==, 1, %$$dim
+    ?return +, %$$array, %$$elem
+  ?else
+    ?if ==, 0, %$$$elem
+      ?return %$$$array
+    ?endif
+    ?for =, %$$$i, 0
+      ?cond >, %$$$dim, =$, %$$$charseq_len, \
+                            call, memory_charseq_len, \
+                              +, %$$$array, %$$$i, END
+      ?if ==, dec, %$$$$dim, %$$$$charseq_len
+        ?if ==, --$, %$$$$$elem, 0
+          ?return +, dec, %$$$$$dim, +, %$$$$$array, %$$$$$i
+        ?endif
+      ?endif
+    ?next ++, %$$$i
+  ?endif
+?endfunc NULL
+
+%endif ; IMPORTED_memory_array_elem
+%endif ; IMPORT_memory_array_elem
+
+
+%pop KERNEL_MEMORY_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:

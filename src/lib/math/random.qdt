@@ -1,0 +1,113 @@
+;
+; random.qdt -- pseudo-random number generator;
+;
+; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 3, or (at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+%push MATH_RANDOM_QDT
+
+
+;;;;;;;;;;;;;;
+; random_seed
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_random_seed
+%ifndef IMPORTED_random_seed
+%define IMPORTED_random_seed
+
+random_seed_0 dw 0000h
+random_seed_1 dw 0000h
+
+%endif ; IMPORTED_random_seed
+%endif ; IMPORT_random_seed
+
+
+;;;;;;;;;;;;;;
+; random_init
+;;;;;;;;;;;;;;
+
+%ifdef IMPORT_random_init
+%ifndef IMPORTED_random_init
+%define IMPORTED_random_init
+
+?import random_seed
+%include "math/random.qdt"
+
+?func random_init
+  mov ah, 00h
+  int 1Ah
+  xor cx, dx
+  mov [random_seed_0], cx
+  mov [random_seed_1], cx
+?endfunc
+
+%endif ; IMPORTED_random_init
+%endif ; IMPORT_random_init
+
+
+;;;;;;;;;;;;;;;;
+; random_number
+;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_random_number
+%ifndef IMPORTED_random_number
+%define IMPORTED_random_number
+
+?import random_seed
+%include "math/random.qdt"
+
+?func random_number, %$a, %$b
+  ?local %$rnd
+  mov ax, [random_seed_0]
+  and ax, 1
+  neg ax
+  cwd
+
+  shr word [random_seed_0], 1
+  shr word [random_seed_1], 1
+  jnc %$next_step
+  or word [random_seed_0], (1 << 15)
+
+%$next_step:
+  and ax, (1 << 0) | (1 << 1)
+  and dx, (1 << 15) | (1 << 5)
+
+  xor [random_seed_0], ax
+  xor [random_seed_1], dx
+
+  mov si, %$a
+  mov di, %$b
+  sub di, si
+  inc di
+
+  mov dx, 0
+  mov ax, [random_seed_0]
+  add ax, [random_seed_1]
+  div di
+
+  add si, dx
+  mov %$rnd, si
+?endfunc %$rnd
+
+%endif ; IMPORTED_random_number
+%endif ; IMPORT_random_number
+
+
+%pop MATH_RANDOM_QDT
+
+; Local Variables:
+; coding: cp437-dos
+; End:
