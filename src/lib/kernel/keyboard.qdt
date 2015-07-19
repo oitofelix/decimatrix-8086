@@ -246,6 +246,16 @@ video_draw_char
     ? =, %$$char, call, keyboard_read_char
     ?switch %$$$char
       ?case ==, BACKSPACE
+      ?case ==, RETURN
+      ?default
+        ?if ||, <, %$$$$char, 20h, \
+                >, %$$$$char, 7Eh
+          ?continue .read_char
+        ?endif
+    ?endswitch
+
+    ?switch %$$$char
+      ?case ==, BACKSPACE
         ?if >, %$$$$i, 0
           ? --, %$$$$i
           ?if !=, %$$$$outchar, NOPRINT
