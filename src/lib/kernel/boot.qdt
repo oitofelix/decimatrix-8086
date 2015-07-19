@@ -46,7 +46,7 @@
 %ifndef IMPORTED_boot_sector
 %define IMPORTED_boot_sector
 
-?import boot_align_code
+?import boot_align_code, BOOT_LOAD_SIGNATURE
 %include "kernel/boot.qdt"
 
 PROGRAM_START:
@@ -64,6 +64,13 @@ mov ss, bx
 mov sp, 0FFFEh
 mov bp, sp
 
+cmp word [%$bls0], BOOT_LOAD_SIGNATURE
+jne %$load
+cmp word [%$bls1], BOOT_LOAD_SIGNATURE
+jne %$load
+jmp %$end
+
+%$load:
 mov dh, 0
 push dx
 push cs
@@ -76,6 +83,8 @@ jmp %$end
 times 0200h - 2 - ($ - $$)  db 0 ; Zerofill up to 510 bytes
 
 dw 0AA55h
+%$bls0 dw BOOT_LOAD_SIGNATURE
+%$bls1 dw BOOT_LOAD_SIGNATURE
 
 %$end:
 
@@ -101,6 +110,20 @@ dw 0AA55h
 
 %endif ; IMPORTED_boot_strap
 %endif ; IMPORT_boot_strap
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+; BOOT_LOAD_SIGNATURE
+;;;;;;;;;;;;;;;;;;;;;;
+
+%ifdef IMPORT_BOOT_LOAD_SIGNATURE
+%ifndef IMPORTED_BOOT_LOAD_SIGNATURE
+%define IMPORTED_BOOT_LOAD_SIGNATURE
+
+BOOT_LOAD_SIGNATURE equ 1456h
+
+%endif ; IMPORTED_BOOT_LOAD_SIGNATURE
+%endif ; IMPORT_BOOT_LOAD_SIGNATURE
 
 
 %pop KERNEL_BOOT_QDT
