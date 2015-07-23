@@ -1,0 +1,3 @@
+baseurl: /decimatrix-8086
+highlighter: pygments
+exclude: ['platforms', 'plugins']
