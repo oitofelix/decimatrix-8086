@@ -92,7 +92,7 @@
 ; ?switch
 ;;;;;;;;;;
 
-%macro ?switch 1+
+%macro ?switch 0-1+
   %push ?switch
   %assign %$func_numargs %$$func_numargs
   %assign %$func_numlocals %$$func_numlocals
@@ -111,9 +111,6 @@
     jmp %$qdot_cond_end
     %$qdot_cond_%[%$flow_i]:
       %assign %$flow_i %$flow_i + 1
-      pop ax
-      push ax
-      push ax
       ? %1
       pop ax
       cmp ax, TRUE
@@ -146,7 +143,6 @@
 %macro ?endswitch 0
   %$qdot_cond_end:
   %$qdot_cond_%[%$flow_i]:
-  pop ax
   %pop ?switch
 %endmacro
 
@@ -227,7 +223,7 @@
 ; ?for
 ;;;;;;;;;;
 
-%macro ?for 1+
+%macro ?for 0-1+
   %push ?for
   %assign %$func_numargs %$$func_numargs
   %assign %$func_numlocals %$$func_numlocals
@@ -259,7 +255,7 @@
 ; ?next
 ;;;;;;;;;;
 
-%macro ?next 1+
+%macro ?next 0-1+
   %$qdot_begin_loop:
   %ifnempty %$qdot_loop_name
     %[%$qdot_loop_name]_continue:

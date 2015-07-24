@@ -243,10 +243,9 @@ video_draw_char
   ? =, %$i, 0
   ? call, video_enable_cursor
   .read_char: ?do
-    ? =, %$$char, call, keyboard_read_char
-    ?switch %$$$char
-      ?case ==, BACKSPACE
-      ?case ==, RETURN
+    ?switch =, %$$$char, call, keyboard_read_char
+      ?case ==, BACKSPACE, %$$$char
+      ?case ==, RETURN, %$$$char
       ?default
         ?if ||, <, %$$$$char, 20h, \
                 >, %$$$$char, 7Eh
@@ -254,8 +253,8 @@ video_draw_char
         ?endif
     ?endswitch
 
-    ?switch %$$$char
-      ?case ==, BACKSPACE
+    ?switch
+      ?case ==, BACKSPACE, %$$$char
         ?if >, %$$$$i, 0
           ? --, %$$$$i
           ?if !=, %$$$$outchar, NOPRINT
@@ -265,7 +264,7 @@ video_draw_char
         ?else
           ? call, speaker_beep, 440, 1
         ?endif
-      ?case ==, RETURN
+      ?case ==, RETURN, %$$$char
         ?break .read_char
       ?default
         ?if <, %$$$$i, %$$$$max

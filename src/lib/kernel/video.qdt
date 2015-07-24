@@ -1167,12 +1167,11 @@ WHITE equ 1111b
   ? =, %$strlen, call, memory_strlen, %$str
   ?for =, %$$i, 0
     ?cond <, %$$i, %$$strlen
-    ? =, %$$char, @byte, +, %$$str, %$$i
-    ?switch %$$$char
-      ?case ==, COLOR_ESC
+    ?switch =, %$$$char, @byte, +, %$$str, %$$i
+      ?case ==, COLOR_ESC, %$$$char
         ? ++, %$$$i
         ? =, %$$$color, @byte, +, %$$$str, %$$$i
-      ?case ==, LF
+      ?case ==, LF, %$$$char
         ?if !=, END, @byte, +, %$$$$str, inc, %$$$$i
           ? call, video_next_row
           ? call, video_setcol, %$$$$startcol
