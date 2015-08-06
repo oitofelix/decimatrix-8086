@@ -43,10 +43,11 @@ You can download the _DeciMatrix_ binary below.
 
 - [DeciMatrix 8086 1.0 binary]({{ page.base_local }}{{ site.baseurl }}/dcmatrix.com)
 
-_DeciMatrix_ is free software and you can obtain its source code here.
-It requires [NASM](http://www.nasm.us/), _The Netwide Assembler_, in
-order to be built, and [GNU Make](http://www.gnu.org/software/make/)
-to automate that process.
+_DeciMatrix_ is free software under _GPLv3+_ and you can obtain its
+source code here.  It requires [NASM](http://www.nasm.us/), _The
+Netwide Assembler_, in order to be built, and
+[GNU Make](http://www.gnu.org/software/make/) to automate that
+process.
 
 - [DeciMatrix 8086 1.0 source code]({{ page.base_local }}{{ site.baseurl }}/decimatrix-8086-1.0.tar.gz)
 - [VCS repository](http://github.com/oitofelix/decimatrix-8086/)
