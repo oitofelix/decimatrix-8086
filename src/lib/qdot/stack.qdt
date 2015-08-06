@@ -22,6 +22,21 @@
 %push QDOT_STACK_QDT
 
 
+
+
+
+;;;;;;;;;;;;
+; Constants
+;;;;;;;;;;;;
+
+?NULL equ 0000h
+?FALSE equ 0000h
+?TRUE equ ~?FALSE
+
+
+
+
+
 ;;;;;
 ; ?
 ;;;;;
@@ -31,7 +46,7 @@
     %rotate -1
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; arithmetic (+, -, *, /, %, inc, dec, abs, min, max, neg)
+    ; Arithmetic (+, -, *, /, %, min, max, neg, inc, dec, abs)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; +, a, b => a+b
@@ -71,7 +86,65 @@
       div bx
       push dx
 
-    ;; inc, a => a-1
+    ;; min, a, b => min(a,b) (unsigned)
+    %elifidni %1, min
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jb %$a
+      push bx
+      jmp %$end
+      %$a: push ax
+      %$end:
+      %pop
+
+    ;; min-, a, b => min(a,b) (signed)
+    %elifidni %1, min-
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jl %$a
+      push bx
+      jmp %$end
+      %$a: push ax
+      %$end:
+      %pop
+
+    ;; max, a, b => max(a,b) (unsigned)
+    %elifidni %1, max
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      ja %$a
+      push bx
+      jmp %$end
+      %$a: push ax
+      %$end:
+      %pop
+
+    ;; max-, a, b => max(a,b) (signed)
+    %elifidni %1, max-
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jg %$a
+      push bx
+      jmp %$end
+      %$a: push ax
+      %$end:
+      %pop
+
+    ;; neg, a => -a
+    %elifidni %1, neg
+      pop ax
+      neg ax
+      push ax
+
+    ;; inc, a => a+1
     %elifidni %1, inc
       pop ax
       inc ax
@@ -93,41 +166,9 @@
       %$end: push ax
       %pop
 
-    ;; min, a, b => min(a,b)
-    %elifidni %1, min
-      %push
-      pop ax
-      pop bx
-      cmp ax, bx
-      jb %$a
-      push bx
-      jmp %$end
-      %$a: push ax
-      %$end:
-      %pop
-
-    ;; max, a, b => max(a,b)
-    %elifidni %1, max
-      %push
-      pop ax
-      pop bx
-      cmp ax, bx
-      ja %$a
-      push bx
-      jmp %$end
-      %$a: push ax
-      %$end:
-      %pop
-
-    ;; neg, a => -a
-    %elifidni %1, neg
-      pop ax
-      neg ax
-      push ax
-
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; bit-wise (~, &, |, ^, <<, >>)
+    ; Bitwise (~, &, |, ^, <<, >>)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; ~, a => ~a
@@ -174,7 +215,7 @@
 
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; boolean (!, &&, ||)
+    ; Boolean (!, &&, ||)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; !, a => !a
@@ -198,9 +239,9 @@
       push ax
 
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; comparison (==, !=, <, <=, >, >=)
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Comparison (==, !=, <, <-, <=, <=-, >, >-, >=, >=-)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; ==, a, b => a==b
     %elifidni %1, ==
@@ -209,10 +250,10 @@
       pop bx
       cmp ax, bx
       je %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
@@ -224,93 +265,139 @@
       pop bx
       cmp ax, bx
       jne %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
 
-    ;; <, a, b => a<b
+    ;; <, a, b => a<b (unsigned)
     %elifidni %1, <
       %push
       pop ax
       pop bx
       cmp ax, bx
       jb %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
 
-    ;; <=, a, b => a<=b
+    ;; <-, a, b => a<b (signed)
+    %elifidni %1, <-
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jl %$true
+      mov ax, ?FALSE
+      jmp %$end
+      %$true:
+        mov ax, ?TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; <=, a, b => a<=b (unsigned)
     %elifidni %1, <=
       %push
       pop ax
       pop bx
       cmp ax, bx
       jbe %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
 
-    ;; <=-, a, b => a<=b
+    ;; <=-, a, b => a<=b (signed)
     %elifidni %1, <=-
       %push
       pop ax
       pop bx
       cmp ax, bx
       jle %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
 
-    ;; >, a, b => a>b
+    ;; >, a, b => a>b (unsigned)
     %elifidni %1, >
       %push
       pop ax
       pop bx
       cmp ax, bx
       ja %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
 
-    ;; >=, a, b => a>=b
+    ;; >-, a, b => a>b (signed)
+    %elifidni %1, >-
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jg %$true
+      mov ax, ?FALSE
+      jmp %$end
+      %$true:
+        mov ax, ?TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; >=, a, b => a>=b (unsigned)
     %elifidni %1, >=
       %push
       pop ax
       pop bx
       cmp ax, bx
       jae %$true
-      mov ax, FALSE
+      mov ax, ?FALSE
       jmp %$end
       %$true:
-        mov ax, TRUE
+        mov ax, ?TRUE
+      %$end:
+      push ax
+      %pop
+
+    ;; >=-, a, b => a>=b (signed)
+    %elifidni %1, >=-
+      %push
+      pop ax
+      pop bx
+      cmp ax, bx
+      jge %$true
+      mov ax, ?FALSE
+      jmp %$end
+      %$true:
+        mov ax, ?TRUE
       %$end:
       push ax
       %pop
 
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; assignment (=, +=, -=, *=, /=, %=, &=, |=, ^=, <<=, >>=)
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Assignment (=, =$, +=, -=, *=, /=, %=, &=, |=, ^=, <<=, >>=, ++,
+    ;             ++$, $++, --, --$, $--)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
     ;; =, a, b => | b -> a
@@ -374,7 +461,6 @@
     ; look ahead -- don't push 'a'
     %elifidni %{-1:-1}, %=
       ; ignore
-
 
     ;; &=, a, b => | a&b -> a
     %elifidni %1, &=
@@ -462,26 +548,21 @@
     %elifidni %{-1:-1}, $--
       ; ignore
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; misc (call, @, ?:)
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    ;; call, a => r1, r2, ..., r(n-1), r(n)
-    %elifidni %1, call
-      call %2
-    ; look ahead -- don't push 'a'
-    %elifidni %{-1:-1}, call
-      ; ignore
-
-    ;; dcall, a => r1, r2, ..., r(n-1), r(n)
-    %elifidni %1, dcall
-      pop ax
-      call ax
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Dereference (@word, @word=, @byte, @byte=)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; @word, a => *a
     %elifidni %1, @word
       pop bx
       push word [bx]
+
+    ;; @word=, a, b => | b -> *a
+    %elifidni %1, @word=
+      pop bx
+      pop ax
+      mov [bx], ax
 
     ;; @byte, a => *a & 00FFh
     %elifidni %1, @byte
@@ -496,13 +577,35 @@
       pop ax
       mov [bx], al
 
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Function call (call, dcall)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; call, a => r1, r2, ..., r(n-1), r(n)
+    %elifidni %1, call
+      call %2
+    ; look ahead -- don't push 'a'
+    %elifidni %{-1:-1}, call
+      ; ignore
+
+    ;; dcall, a => r1, r2, ..., r(n-1), r(n)
+    %elifidni %1, dcall
+      pop ax
+      call ax
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Flow (?:)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
     ;; ?:, a, b, c => a ? b : c
     %elifidni %1, ?:
       %push
       pop ax
       pop bx
       pop cx
-      cmp ax, TRUE
+      cmp ax, ?TRUE
       je %$b
       push cx
       jmp %$end
@@ -512,7 +615,7 @@
 
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; meta (drop)
+    ; Stack (drop, dup)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; drop

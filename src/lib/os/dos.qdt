@@ -33,9 +33,9 @@
   int 21h
   cmp al, 00h
   jz %$not_running
-  ?return TRUE
+  ?return ?TRUE
   %$not_running:
-?endfunc FALSE
+?endfunc ?FALSE
 
 %endif ; IMPORTED_dos_check_if_running
 %endif ; IMPORT_dos_check_if_running

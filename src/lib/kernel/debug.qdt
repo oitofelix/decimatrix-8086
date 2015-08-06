@@ -40,29 +40,30 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
-; debug_print_hex_digit
+; debug_print_nibble
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-%ifdef IMPORT_debug_print_hex_digit
-%ifndef IMPORTED_debug_print_hex_digit
-%define IMPORTED_debug_print_hex_digit
+%ifdef IMPORT_debug_print_nibble
+%ifndef IMPORTED_debug_print_nibble
+%define IMPORTED_debug_print_nibble
 
 ?import debug_print_char
 %include "kernel/debug.qdt"
 
-?func debug_print_hex_digit, %$digit
-  mov al, %$digit
+?func debug_print_nibble, %$n
+  mov al, %$n
+  and al, 0Fh
   add al, 30h
   cmp al, 3Ah
   jb .print
   add al, 07h
   .print:
-    mov %$digit, al
-    ? call, debug_print_char, %$digit
+    mov %$n, al
+    ? call, debug_print_char, %$n
 ?endfunc
 
-%endif ; IMPORTED_debug_print_hex_digit
-%endif ; IMPORT_debug_print_hex_digit
+%endif ; IMPORTED_debug_print_nibble
+%endif ; IMPORT_debug_print_nibble
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,20 +74,20 @@
 %ifndef IMPORTED_debug_print_byte
 %define IMPORTED_debug_print_byte
 
-?import debug_print_hex_digit
+?import debug_print_nibble
 %include "kernel/debug.qdt"
 
-?func debug_print_byte, %$byte
-  ?local %$hex_digit
-  mov al, %$byte
+?func debug_print_byte, %$n
+  ?local %$nibble
+  mov al, %$n
   mov cl, 4
   shr al, cl
-  mov %$hex_digit, al
-  ? call, debug_print_hex_digit, %$hex_digit
-  mov al, %$byte
+  mov %$nibble, al
+  ? call, debug_print_nibble, %$nibble
+  mov al, %$n
   and al, 0Fh
-  mov %$hex_digit, al
-  ? call, debug_print_hex_digit, %$hex_digit
+  mov %$nibble, al
+  ? call, debug_print_nibble, %$nibble
 ?endfunc
 
 %endif ; IMPORTED_debug_print_byte
@@ -104,13 +105,13 @@
 ?import debug_print_byte
 %include "kernel/debug.qdt"
 
-?func debug_print_word, %$word
+?func debug_print_word, %$n
   ?local %$byte
-  mov ax, %$word
+  mov ax, %$n
   mov al, ah
   mov %$byte, ax
   ? call, debug_print_byte, %$byte
-  ? call, debug_print_byte, %$word
+  ? call, debug_print_byte, %$n
 ?endfunc
 
 %endif ; IMPORTED_debug_print_word

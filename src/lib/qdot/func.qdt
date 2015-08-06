@@ -36,45 +36,11 @@
   %assign %$func_numargs %0 - 1
   %assign %$func_numlocals 0
   %assign %$qdot_nesting 0
-  %if %0 == 1
-    func_define_parameters
-  %else
-    func_define_parameters %{2:-1}
-  %endif
-%endmacro
-
-
-;;;;;;;;;;;;;;
-; ?lfunc
-;;;;;;;;;;;;;;
-
-%macro ?lfunc 1-*
-  %ifctx ?func
-    %error "Previous function definition missing '?endfunc'"
-  %endif
-  %$ %+ %1:
-  %push ?func
-  %xdefine func_name %1
-  %assign %$func_numargs %0 - 1
-  %assign %$func_numlocals 0
-  %assign %$qdot_nesting 0
-  %if %0 == 1
-    func_define_parameters
-  %else
-    func_define_parameters %{2:-1}
-  %endif
-%endmacro
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;
-; func_define_parameters
-;;;;;;;;;;;;;;;;;;;;;;;;;
-
-%macro func_define_parameters 0-*
   push bp
   mov bp, sp
   %assign i 2 ; accounts for 'push bp'
-  %rep %0
+  %rotate 1
+  %rep %0 - 1
     %assign i i + 2
     %xdefine %1 [bp + i]
     %rotate 1
@@ -96,20 +62,6 @@
   %endrep
   sub sp, i
 %endmacro
-
-
-;;;;;;;;;;;;;;
-; movarg
-;;;;;;;;;;;;;;
-
-; %macro ?movarg 2
-;   push si
-;   mov si, %2
-;   inc si
-;   shl si, 1
-;   mov %1, [bp + si]
-;   pop si
-; %endmacro
 
 
 ;;;;;;;;;;;;;;
@@ -203,6 +155,19 @@
     %define IMPORT_%[%1]
     %rotate 1
   %endrep
+%endmacro
+
+
+;;;;;;;;;;;;;;
+; debug
+;;;;;;;;;;;;;;
+
+%macro ?debug 1+
+  %push debug
+  jmp %%debug_end
+  %%debug db %1
+  %%debug_end:
+  %pop debug
 %endmacro
 
 

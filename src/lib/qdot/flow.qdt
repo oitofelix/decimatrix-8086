@@ -1,5 +1,5 @@
 ;
-; flow.qdot -- QDot flow control;
+; flow.qdot -- QDot flow-control;
 ;
 ; Copyright (C) 2015 Bruno F‚lix Rezende Ribeiro <oitofelix@gnu.org>
 ;
@@ -23,6 +23,7 @@
 
 
 
+
 
 ;;;;;;
 ; ?if
@@ -35,7 +36,7 @@
   %assign %$flow_i 0
   ? %1
   pop ax
-  cmp ax, TRUE
+  cmp ax, ?TRUE
   jne %$qdot_cond_%[%$flow_i]
 %endmacro
 
@@ -51,7 +52,7 @@
       %assign %$flow_i %$flow_i + 1
       ? %1
       pop ax
-      cmp ax, TRUE
+      cmp ax, ?TRUE
       jne %$qdot_cond_%[%$flow_i]
   %else
     %error "Expected '?if' before '?elseif'"
@@ -113,7 +114,7 @@
       %assign %$flow_i %$flow_i + 1
       ? %1
       pop ax
-      cmp ax, TRUE
+      cmp ax, ?TRUE
       jne %$qdot_cond_%[%$flow_i]
   %else
     %error "Expected '?switch' before '?case'"
@@ -176,7 +177,7 @@
   %ifctx ?do
     ? %1
     pop ax
-    cmp ax, TRUE
+    cmp ax, ?TRUE
     je %$qdot_begin_loop
     %$qdot_end_loop:
     %ifnempty %$qdot_loop_name
@@ -196,7 +197,7 @@
     %endif
       ? %1
       pop ax
-      cmp ax, FALSE
+      cmp ax, ?FALSE
       je %$qdot_end_loop
   %endif
 %endmacro
@@ -243,7 +244,7 @@
   %ifctx ?for
       ? %1
       pop ax
-      cmp ax, TRUE
+      cmp ax, ?TRUE
       jne %$qdot_end_loop
   %else
     %error "Expected '?for' before '?cond'"

@@ -65,9 +65,9 @@
 %ifndef IMPORTED_timer_wait
 %define IMPORTED_timer_wait
 
-?func timer_wait, %$miliseconds
+?func timer_wait, %$milliseconds
   mov ax, 1024
-  mul word %$miliseconds
+  mul word %$milliseconds
   mov cx, dx
   mov dx, ax
   mov ah, 86h
@@ -105,9 +105,9 @@ timer_alarm_ticks dw 0000h
   sub dx, [timer_alarm_start_tick]
   cmp dx, [timer_alarm_ticks]
   jb %$end
-  ?return TRUE
+  ?return ?TRUE
   %$end:
-?endfunc FALSE
+?endfunc ?FALSE
 
 %endif ; IMPORTED_timer_alarm
 %endif ; IMPORT_timer_alarm
