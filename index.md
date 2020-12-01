@@ -119,13 +119,19 @@ To get a feel of how _DeciMatrix_ looks like, a video of a session
 recorded in _DOSBox_, specifically for this purpose, has been made
 available.  Enjoy!
 
-<video controls>
-  <source src="{{ page.base_local }}{{ site.baseurl }}/decimatrix.mp4" type="video/mp4">
-</video>
+https://www.youtube.com/watch?v=
 
-<div style="text-align: center;" markdown="1">
-[Original recording]({{ page.base_local }}{{ site.baseurl }}/decimatrix.avi)
-</div>
+<a target="_blank" href="https://www.youtube.com/watch?v=Le3k6cRZaE0">
+    <img src="https://img.youtube.com/vi/Le3k6cRZaE0/0.jpg" alt="DeciMatrix 8086" />
+</a>
+
+<!-- <video controls> -->
+<!--   <source src="{{ page.base_local }}{{ site.baseurl }}/decimatrix.mp4" type="video/mp4"> -->
+<!-- </video> -->
+
+<!-- <div style="text-align: center;" markdown="1"> -->
+<!-- [Original recording]({{ page.base_local }}{{ site.baseurl }}/decimatrix.avi) -->
+<!-- </div> -->
 
 
 </div>
