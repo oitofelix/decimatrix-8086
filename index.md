@@ -119,8 +119,6 @@ To get a feel of how _DeciMatrix_ looks like, a video of a session
 recorded in _DOSBox_, specifically for this purpose, has been made
 available.  Enjoy!
 
-https://www.youtube.com/watch?v=
-
 <a target="_blank" href="https://www.youtube.com/watch?v=Le3k6cRZaE0">
     <img src="https://img.youtube.com/vi/Le3k6cRZaE0/0.jpg" alt="DeciMatrix 8086" />
 </a>
